@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
 import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.Rutina;
 
@@ -26,7 +27,7 @@ public class DatosRutina {
     public DatosRutina(String nombre, Objetivo objetivo){
         this.nombre = nombre;
         this.objetivo = objetivo;
-        this.descripcion = "Rutina para lograr " + this.objetivo.formatear();
+        this.descripcion = "Rutina para lograr " + this.objetivo.getDescripcion();
         this.ejercicios = new ArrayList<>();
     }
 
@@ -34,15 +35,15 @@ public class DatosRutina {
         this.nombre = nombre;
         this.ejercicios = ejercicios;
         this.objetivo = objetivo;
-        this.descripcion = "Rutina para lograr " + this.objetivo.formatear();
+        this.descripcion = "Rutina para lograr " + this.objetivo.getDescripcion();
     }
 
     public DatosRutina(Rutina rutina){
         this.id = rutina.getIdRutina();
         this.nombre = rutina.getNombre();
         this.ejercicios = rutina.getEjercicios();
-        this.objetivo = rutina.getObjetivo();
-        this.descripcion = "Rutina para lograr " + this.objetivo.formatear();
+        ;
+        this.descripcion = "Rutina para lograr " + this.objetivo.getDescripcion();
     }
 
     public String getNombre() {

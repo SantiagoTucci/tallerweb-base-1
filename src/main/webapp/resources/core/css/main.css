@@ -861,3 +861,22 @@ position: relative;
         right: 40px;
         z-index: 1;
 }
+
+ .form-container {
+            margin-top: 50px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-group button {
+            margin-top: 10px;
+        }
+        .btn-option {
+            margin-right: 10px;
+        }
+        .btn-option:hover {
+            transform: scale(1.05);
+        }

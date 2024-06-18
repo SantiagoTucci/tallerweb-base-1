@@ -1,11 +1,11 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.Usuario;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UsuarioRepository {
+public class RepositorioUsuario {
     private final Map<String, Usuario> usuarios = new HashMap<>();
 
     public Usuario findByEmail(String email) {

@@ -1,6 +1,7 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.usuarioRutina;
 
 import com.tallerwebi.dominio.rutina.Rutina;
+import com.tallerwebi.dominio.usuario.Usuario;
 
 import javax.persistence.*;
 import java.util.Date;

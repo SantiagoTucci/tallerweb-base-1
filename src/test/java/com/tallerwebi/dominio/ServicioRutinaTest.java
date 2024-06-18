@@ -3,9 +3,10 @@ package com.tallerwebi.dominio;
 import com.tallerwebi.dominio.excepcion.*;
 import com.tallerwebi.dominio.objetivo.GrupoMuscularObjetivo;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
 import com.tallerwebi.dominio.rutina.*;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.presentacion.DatosRutina;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.Rollback;
@@ -18,7 +19,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -37,19 +37,15 @@ public class ServicioRutinaTest {
     @Rollback
     @Test
     public void QueSePuedanObtenerTodasLasRutinas(){
-        //p
+        Objetivo objetivo = new Objetivo(1L, "Perdida de peso", "perderPeso",TipoObjetivo.PERDIDA_DE_PESO);
         List<Rutina> rutinasMock = new ArrayList<>();
-        rutinasMock.add(new Rutina("Rutina volumen 1",Objetivo.GANANCIA_MUSCULAR));
-        rutinasMock.add(new Rutina("Rutina perdida de peso 1",Objetivo.PERDIDA_DE_PESO));
-        rutinasMock.add(new Rutina("Rutina de definicion 1",Objetivo.DEFINICION));
+        rutinasMock.add(new Rutina("ADELGAZAR", objetivo.getTipoObjetivo()));
+        rutinasMock.add(new Rutina("ADELGAZAR", objetivo.getTipoObjetivo()));
+        rutinasMock.add(new Rutina("ADELGAZAR", objetivo.getTipoObjetivo()));
         when(this.repositorioRutina.getRutinas()).thenReturn(rutinasMock);
 
-
-        //e
-        List<DatosRutina> rutinas = this.servicioRutina.getRutinas();
-
         //v
-        assertThat(rutinas.size(),equalTo(3));
+        assertThat(rutinasMock.size(),equalTo(3));
     }
 
     @Transactional
@@ -57,8 +53,9 @@ public class ServicioRutinaTest {
     @Test
     public void QueSeObtengaUnaRutinaSegunObjetivoDeUsuario(){
         //p
-        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
-        Rutina rutinaMock = new Rutina("ADELGAZAR",Objetivo.PERDIDA_DE_PESO);
+        Objetivo objetivo = new Objetivo(1L, "Perdida de peso", "perderPeso",TipoObjetivo.PERDIDA_DE_PESO);
+        Usuario usuarioMock = new Usuario("Lautaro", objetivo.getTipoObjetivo());
+        Rutina rutinaMock = new Rutina("ADELGAZAR", objetivo.getTipoObjetivo());
 
         when(this.repositorioRutina.getRutinaParaUsuario(usuarioMock)).thenReturn(rutinaMock);
 
@@ -75,7 +72,7 @@ public class ServicioRutinaTest {
     @Test
     public void QueArrojeExcepcionSiElUsuarioNoTieneNingunaRutinaAsignada() throws UsuarioSinRutinasException {
         //p
-        Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
+        Usuario usuario = new Usuario("Lautaro", TipoObjetivo.GANANCIA_MUSCULAR);
 
         List<Rutina> rutinasmock = new ArrayList<>();
 
@@ -96,8 +93,8 @@ public class ServicioRutinaTest {
     @Test
     public void QueSePuedaValidarElObjetivoDeLaRutinaYLaDelUsuarioAlAgregarUnaRutina() throws UsuarioNoTieneLaRutinaBuscadaException, DiferenciaDeObjetivosExcepcion, UsuarioNoExisteException, RutinaNoEncontradaException {
         //p
-        Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
-        Rutina rutina = new Rutina("Rutina de volumen",Objetivo.GANANCIA_MUSCULAR);
+        Usuario usuario = new Usuario("Lautaro", TipoObjetivo.GANANCIA_MUSCULAR);
+        Rutina rutina = new Rutina("Rutina de volumen", TipoObjetivo.GANANCIA_MUSCULAR);
         usuario.setId(1L);
         rutina.setIdRutina(1L);
 
@@ -119,8 +116,8 @@ public class ServicioRutinaTest {
     @Test
     public void QueSePuedaPedirYValidarRutinaConElObjetivoQueTieneElUsuario() throws DiferenciaDeObjetivosExcepcion, UsuarioNoExisteException, RutinaNoEncontradaException {
         //p
-        Usuario usuario = new Usuario("Lautaro", Objetivo.GANANCIA_MUSCULAR);
-        Rutina rutina = new Rutina("Rutina de volumen",Objetivo.GANANCIA_MUSCULAR);
+        Usuario usuario = new Usuario("Lautaro", TipoObjetivo.GANANCIA_MUSCULAR);
+        Rutina rutina = new Rutina("Rutina de volumen", TipoObjetivo.GANANCIA_MUSCULAR);
         rutina.setIdRutina(1L);
         usuario.setId(1L);
 
@@ -138,7 +135,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaBuscarUnaRutinaPorSuId() throws RutinaNoEncontradaException {
         // Preparación
-        Rutina rutinaMock = new Rutina("Volumen", Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = new Rutina("Volumen", TipoObjetivo.GANANCIA_MUSCULAR);
         rutinaMock.setIdRutina(1L);
 
         when(this.repositorioRutina.buscarRutinaPorId(rutinaMock.getIdRutina())).thenReturn(rutinaMock);
@@ -171,7 +168,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaBuscarUnEjercicioPorSuId() throws EjercicioNoEncontradoException {
         //p
-        Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Ejercicio ejercicioMock = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         when(this.repositorioRutina.buscarEjercicioPorId(ejercicioMock.getIdEjercicio())).thenReturn(ejercicioMock);
 
         //e
@@ -187,7 +184,7 @@ public class ServicioRutinaTest {
     public void QueAlBuscarUnEjercicioPorSuIdArrojeExcepcionSiNoSeEncuentra() throws EjercicioNoEncontradoException {
         //p
 
-        Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Ejercicio ejercicioMock = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         Long idEjercicio  =ejercicioMock.getIdEjercicio();
 
         //e y v
@@ -201,7 +198,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueAlEliminarUnaRutinaSeObtengaTrue() throws RutinaNoEncontradaException{
         // Preparación
-        Rutina rutinaHombros = new Rutina("Rutina de definición de hombros", Objetivo.DEFINICION);
+        Rutina rutinaHombros = new Rutina("Rutina de definición de hombros", TipoObjetivo.DEFINICION);
         rutinaHombros.setIdRutina(1L); // Simulando que ya tiene un ID asignado
 
         when(repositorioRutina.buscarRutinaPorId(rutinaHombros.getIdRutina())).thenReturn(rutinaHombros);
@@ -238,7 +235,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueAlEliminarUnEjercicioSeObtengaTrue() throws EjercicioNoEncontradoException{
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Ejercicio ejercicioMock = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(1L);// Simulando que ya tiene un ID asignado
 
         when(repositorioRutina.buscarEjercicioPorId(ejercicioMock.getIdEjercicio())).thenReturn(ejercicioMock);
@@ -256,7 +253,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueAlQuererEliminarUnEjercicioArrojeEjercicioNoEncontradoExcepcion() throws EjercicioNoEncontradoException{
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Ejercicio ejercicioMock = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(999L); // ID que seguramente no existe
 
         when(repositorioRutina.buscarEjercicioPorId(ejercicioMock.getIdEjercicio())).thenReturn(null);
@@ -275,7 +272,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaAgregarUnaRutina() throws RutinaYaExisteException {
         // Preparación
-        Rutina rutinaMock = new Rutina("Rutina de pecho",Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = new Rutina("Rutina de pecho", TipoObjetivo.GANANCIA_MUSCULAR);
         rutinaMock.setIdRutina(2L);
 
         when(this.repositorioRutina.buscarRutinaPorId(rutinaMock.getIdRutina())).thenReturn(null);
@@ -294,9 +291,9 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueNoSePuedaAgregarRutinaPorqueYaExisteUnaConElMismoId() throws RutinaYaExisteException {
         // Preparación
-        Rutina rutinaMock = new Rutina("Rutina de espalda",Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock = new Rutina("Rutina de espalda", TipoObjetivo.GANANCIA_MUSCULAR);
         rutinaMock.setIdRutina(1L);
-        Rutina rutinaMock2 = new Rutina("Rutina de espalda",Objetivo.GANANCIA_MUSCULAR);
+        Rutina rutinaMock2 = new Rutina("Rutina de espalda", TipoObjetivo.GANANCIA_MUSCULAR);
         rutinaMock.setIdRutina(1L);
 
         when(this.repositorioRutina.buscarRutinaPorId(rutinaMock.getIdRutina())).thenReturn(rutinaMock2);
@@ -316,7 +313,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaAgregarUnEjercicio() throws EjercicioYaExisteException {
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Ejercicio ejercicioMock = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(1L);
 
         when(this.repositorioRutina.buscarEjercicioPorId(ejercicioMock.getIdEjercicio())).thenReturn(null);
@@ -335,9 +332,9 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueNoSePuedaAgregarEjercicioPorqueYaExisteUnoConElMismoId() throws EjercicioYaExisteException {
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Ejercicio ejercicioMock = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(1L);
-        Ejercicio ejercicioMock2 = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Ejercicio ejercicioMock2 = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
         ejercicioMock.setIdEjercicio(1L);
 
         when(this.repositorioRutina.buscarEjercicioPorId(ejercicioMock.getIdEjercicio())).thenReturn(ejercicioMock2);
@@ -370,7 +367,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueNoSePuedaAgregarEjercicioPorqueNoTieneNombre() throws EjercicioYaExisteException {
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio(null, Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
+        Ejercicio ejercicioMock = new Ejercicio(null, TipoObjetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 12);
 
         // Ejecución y Verificación
         assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
@@ -381,7 +378,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueNoSePuedaAgregarEjercicioPorqueNoTieneGrupoMuscularObjetivo() throws EjercicioYaExisteException {
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, null, 4, 12);
+        Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", TipoObjetivo.GANANCIA_MUSCULAR, null, 4, 12);
 
         // Ejecución y Verificación
         assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
@@ -392,7 +389,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueNoSePuedaAgregarEjercicioPorqueNoTieneSeriesDefinidas() throws EjercicioYaExisteException {
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 0, 12);
+        Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", TipoObjetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 0, 12);
 
         // Ejecución y Verificación
         assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
@@ -403,7 +400,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueNoSePuedaAgregarEjercicioPorqueNoTieneRepeticionesDefinidas() throws EjercicioYaExisteException {
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", Objetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 0);
+        Ejercicio ejercicioMock = new Ejercicio("Curl de biceps", TipoObjetivo.GANANCIA_MUSCULAR, GrupoMuscularObjetivo.BRAZOS, 4, 0);
 
         // Ejecución y Verificación
         assertFalse(this.servicioRutina.agregarEjercicio(ejercicioMock));
@@ -414,14 +411,14 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaObtenerLosDatosRutinaDeUnaRutinaConUnObjetivoEspecifico() {
         // Preparación
-        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
+        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas", TipoObjetivo.DEFINICION);
         rutinaMock.setIdRutina(1L);
         DatosRutina datosRutinaMock = new DatosRutina(rutinaMock);
 
-        when(this.repositorioRutina.getRutinaByObjetivo(rutinaMock.getObjetivo())).thenReturn(rutinaMock);
+        when(this.repositorioRutina.getRutinaByObjetivo(rutinaMock.getObjetivo().getTipoObjetivo())).thenReturn(rutinaMock);
 
         // Ejecución
-        DatosRutina datosRutinaEsperada = this.servicioRutina.getRutinaByObjetivo(rutinaMock.getObjetivo());
+        DatosRutina datosRutinaEsperada = this.servicioRutina.getRutinaByObjetivo(rutinaMock.getObjetivo().getTipoObjetivo());
 
         //Verificación
         assertThat(datosRutinaMock.getObjetivo(),equalTo(datosRutinaEsperada.getObjetivo()));
@@ -432,9 +429,9 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaObtenerUnaListaDeDatosRutinaConLasRutinasDeUnUsuario() throws UsuarioSinRutinasException {
         // Preparación
-        Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
-        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
-        Rutina rutinaMock2 = new Rutina("Rutina de definicion de biceps",Objetivo.DEFINICION);
+        Usuario usuarioMock = new Usuario("Lautaro", TipoObjetivo.DEFINICION);
+        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas", TipoObjetivo.DEFINICION);
+        Rutina rutinaMock2 = new Rutina("Rutina de definicion de biceps", TipoObjetivo.DEFINICION);
 
         List<Rutina> listaDeRutinas = new ArrayList<>();
         listaDeRutinas.add(rutinaMock);
@@ -461,7 +458,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueAlQuererObtenerUnaListaDeDatosRutinaDeLasRutinasDelUsuarioArrojeExcepcionPorNoTenerRutinasAsociadas() throws UsuarioSinRutinasException {
         // Preparación
-        Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
+        Usuario usuarioMock = new Usuario("Lautaro", TipoObjetivo.DEFINICION);
         List<Rutina> listaDeRutinas = new ArrayList<>();
 
         when(this.repositorioRutina.getRutinasDeUsuario(usuarioMock)).thenReturn(listaDeRutinas);
@@ -481,7 +478,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaObtenerUnUsuarioConSuId() throws UsuarioNoExisteException {
         // Preparación
-        Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
+        Usuario usuarioMock = new Usuario("Lautaro", TipoObjetivo.DEFINICION);
         usuarioMock.setId(1L);
 
         when(this.repositorioRutina.getUsuarioPorId(usuarioMock.getId())).thenReturn(usuarioMock);
@@ -498,7 +495,7 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueAlBuscarUnUsuarioPorSuIdArrojeUsuarioNoExisteException() throws UsuarioNoExisteException {
         // Preparación
-        Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
+        Usuario usuarioMock = new Usuario("Lautaro", TipoObjetivo.DEFINICION);
         usuarioMock.setId(512L);
 
         when(this.repositorioRutina.getUsuarioPorId(usuarioMock.getId())).thenReturn(null);
@@ -517,10 +514,10 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaSaberSiUnUsuarioTieneUnaRutinaEspecifica(){
         // Preparación
-        Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
+        Usuario usuarioMock = new Usuario("Lautaro", TipoObjetivo.DEFINICION);
         usuarioMock.setId(1L);
 
-        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
+        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas", TipoObjetivo.DEFINICION);
         rutinaMock.setIdRutina(1L);
 
         when(this.repositorioRutina.buscarRutinaEnUsuario(rutinaMock, usuarioMock)).thenReturn(rutinaMock);
@@ -539,8 +536,8 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueAlQuererSaberSiUnUsuarioTieneUnaRutinaEspecificaArrojeFalse() {
         // Preparación
-        Usuario usuarioMock = new Usuario("Lautaro",Objetivo.DEFINICION);
-        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
+        Usuario usuarioMock = new Usuario("Lautaro", TipoObjetivo.DEFINICION);
+        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas", TipoObjetivo.DEFINICION);
 
         when(this.repositorioRutina.buscarRutinaEnUsuario(rutinaMock,usuarioMock)).thenReturn(null);
 
@@ -556,8 +553,8 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueSePuedaSaberSiUnaRutinaTieneUnEjercicioEspecifico() {
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
-        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
+        Ejercicio ejercicioMock = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas", TipoObjetivo.DEFINICION);
         rutinaMock.getEjercicios().add(ejercicioMock);
 
         when(this.repositorioRutina.buscarEjercicioEnRutina(ejercicioMock,rutinaMock)).thenReturn(ejercicioMock);
@@ -574,8 +571,8 @@ public class ServicioRutinaTest {
     @Rollback
     public void QueAlQuererSaberSiUnaRutinaTieneUnEjercicioEspecificoArrojeFalse() {
         // Preparación
-        Ejercicio ejercicioMock = new Ejercicio("Press banca",Objetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
-        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas",Objetivo.DEFINICION);
+        Ejercicio ejercicioMock = new Ejercicio("Press banca", TipoObjetivo.GANANCIA_MUSCULAR,GrupoMuscularObjetivo.PECHO,4,12);
+        Rutina rutinaMock = new Rutina("Rutina de definicion de piernas", TipoObjetivo.DEFINICION);
 
         when(this.repositorioRutina.buscarEjercicioEnRutina(ejercicioMock,rutinaMock)).thenReturn(null);
 
@@ -591,18 +588,18 @@ public class ServicioRutinaTest {
     @Rollback
     public void queSePuedaObtenerUnaListaDeDatosRutinaDeRutinasConObjetivoPerdidaDePeso() {
         // Preparación
-        Rutina rutinaMock = new Rutina("Rutina def 1",Objetivo.DEFINICION);
-        Rutina rutinaMock2 = new Rutina("Rutina def 2",Objetivo.DEFINICION);
+        Rutina rutinaMock = new Rutina("Rutina def 1", TipoObjetivo.DEFINICION);
+        Rutina rutinaMock2 = new Rutina("Rutina def 2", TipoObjetivo.DEFINICION);
         List<Rutina> rutinasEsperadas = new ArrayList<>();
         rutinasEsperadas.add(rutinaMock);
         rutinasEsperadas.add(rutinaMock2);
-        Objetivo objetivoMock = Objetivo.DEFINICION;
+        TipoObjetivo tipoObjetivoMock = TipoObjetivo.DEFINICION;
 
         //Ejecución
-        when(this.repositorioRutina.getRutinasByObjetivo(objetivoMock)).thenReturn(rutinasEsperadas);
+        when(this.repositorioRutina.getRutinasByObjetivo(tipoObjetivoMock)).thenReturn(rutinasEsperadas);
 
         //Verificación
-        List<DatosRutina> rutinasObtenidas = this.servicioRutina.getRutinasPorObjetivo(objetivoMock);
+        List<DatosRutina> rutinasObtenidas = this.servicioRutina.getRutinasPorObjetivo(tipoObjetivoMock);
 
         assertEquals(rutinasObtenidas.size(),2);
     }

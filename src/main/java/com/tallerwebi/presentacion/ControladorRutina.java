@@ -1,7 +1,7 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.rutina.Rutina;
 import com.tallerwebi.dominio.rutina.ServicioRutina;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +29,17 @@ public class ControladorRutina {
     public ModelAndView VerRutinasQueLeInteresanAlUsuario(@RequestParam("objetivo") String objetivo) {
         ModelAndView modelAndView = new ModelAndView("rutinas");
 
-        Objetivo objetivoEnum;
+        TipoObjetivo tipoObjetivoEnum;
         try {
-            objetivoEnum = Objetivo.valueOf(objetivo);
+            tipoObjetivoEnum = TipoObjetivo.valueOf(objetivo);
         } catch (IllegalArgumentException e) {
             modelAndView.addObject("error", "Objetivo no válido");
             return modelAndView;
         }
 
-        List<DatosRutina> rutinas = this.servicioRutina.getRutinasPorObjetivo(objetivoEnum);
+        List<DatosRutina> rutinas = this.servicioRutina.getRutinasPorObjetivo(tipoObjetivoEnum);
         modelAndView.addObject("rutinas", rutinas);
-        modelAndView.addObject("objetivoFormateado", objetivoEnum.formatear());
+        modelAndView.addObject("objetivoFormateado", tipoObjetivoEnum.formatear());
 
         return modelAndView;
     }
@@ -63,7 +63,7 @@ public class ControladorRutina {
             modelAndView.setViewName("rutina");
         } catch (Exception e) {
             modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString());
-            modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());
+//            modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());  estoy modificando Objetivo
         }
 
         return modelAndView;
@@ -122,7 +122,7 @@ public class ControladorRutina {
                 // Redirigir a la sección de rutinas en base al objetivo del usuario
                 modelAndView.setViewName("redirect:/rutinas?objetivo=" + usuario.getObjetivo().toString());
                 modelAndView.addObject("info", "Rutina liberada.");
-                modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());
+//                modelAndView.addObject("objetivoFormateado", usuario.getObjetivo().formatear());
             } else {
                 // Si el usuario o la rutina no existen, redirigir a la página de objetivos
                 modelAndView.addObject("error", "Error al liberar la rutina.");

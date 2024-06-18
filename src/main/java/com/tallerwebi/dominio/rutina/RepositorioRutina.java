@@ -1,17 +1,17 @@
 package com.tallerwebi.dominio.rutina;
 
-import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.UsuarioRutina;
-import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
+import com.tallerwebi.dominio.usuario.Usuario;
+import com.tallerwebi.dominio.usuarioRutina.UsuarioRutina;
 
 import java.util.List;
 
 public interface RepositorioRutina {
     List<Rutina> getRutinas();
 
-    Rutina getRutinaByObjetivo(Objetivo objetivo);
+    Rutina getRutinaByObjetivo(TipoObjetivo tipoObjetivo);
 
-    List<Rutina> getRutinasByObjetivo(Objetivo objetivo);
+    List<Rutina> getRutinasByObjetivo(TipoObjetivo tipoObjetivo);
 
     Rutina getRutinaParaUsuario(Usuario usuario);
 
@@ -75,4 +75,6 @@ public interface RepositorioRutina {
     void guardarUsuarioRutina(UsuarioRutina usuarioRutina);
 
     Rutina getUltimaRutinaRealizadaPorUsuario(Usuario usuario);
+
+
 }

@@ -1,8 +1,8 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.UsuarioRutina;
-import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
+import com.tallerwebi.dominio.usuario.Usuario;
+import com.tallerwebi.dominio.usuarioRutina.UsuarioRutina;
 import com.tallerwebi.dominio.rutina.Ejercicio;
 import com.tallerwebi.dominio.rutina.RepositorioRutina;
 import com.tallerwebi.dominio.rutina.Rutina;
@@ -37,10 +37,10 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
-    public Rutina getRutinaByObjetivo(Objetivo objetivo) {
+    public Rutina getRutinaByObjetivo(TipoObjetivo tipoObjetivo) {
         String hql = "FROM Rutina WHERE objetivo = :objetivo";
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("objetivo",objetivo);
+        query.setParameter("objetivo", tipoObjetivo);
 
         try {
             return (Rutina) query.getSingleResult();
@@ -51,10 +51,10 @@ public class RepositorioRutinaImpl implements RepositorioRutina {
     }
 
     @Override
-    public List<Rutina> getRutinasByObjetivo(Objetivo objetivo) {
+    public List<Rutina> getRutinasByObjetivo(TipoObjetivo tipoObjetivo) {
         String hql = "FROM Rutina WHERE objetivo = :objetivo";
         return sessionFactory.getCurrentSession().createQuery(hql, Rutina.class)
-                .setParameter("objetivo", objetivo)
+                .setParameter("objetivo", tipoObjetivo)
                 .list();
     }
 

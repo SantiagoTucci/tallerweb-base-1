@@ -1,8 +1,8 @@
 package com.tallerwebi.dominio.rutina;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.dominio.excepcion.*;
-import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
 import com.tallerwebi.presentacion.DatosRutina;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public interface ServicioRutina {
 
     boolean eliminarEjercicio(Ejercicio ejercicio) throws EjercicioNoEncontradoException;
 
-    DatosRutina getRutinaByObjetivo(Objetivo objetivo);
+    DatosRutina getRutinaByObjetivo(TipoObjetivo tipoObjetivo);
 
     DatosRutina getRutinaParaUsuario(Usuario usuario);
 
@@ -39,7 +39,7 @@ public interface ServicioRutina {
     boolean existeRutinaEnUsuario(Rutina rutina, Usuario usuario);
     boolean existeEjercicioEnRutina(Ejercicio ejercicio, Rutina rutina);
 
-    List<DatosRutina> getRutinasPorObjetivo(Objetivo objetivo);
+    List<DatosRutina> getRutinasPorObjetivo(TipoObjetivo tipoObjetivo);
 
     DatosRutina getRutinaActualDelUsuario(Usuario usuario) throws UsuarioNoExisteException;
 

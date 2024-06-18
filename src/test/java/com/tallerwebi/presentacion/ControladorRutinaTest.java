@@ -1,8 +1,9 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.objetivo.Objetivo;
-import com.tallerwebi.dominio.rutina.RepositorioRutina;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
+import com.tallerwebi.dominio.usuario.Usuario;
+
+import static com.tallerwebi.dominio.objetivo.TipoObjetivo.PERDIDA_DE_PESO;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.rutina.Rutina;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -46,13 +46,13 @@ public class ControladorRutinaTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(controladorRutina).build();
         usuarioMock = new Usuario();
         usuarioMock.setNombre("Lautaro");
-        usuarioMock.setObjetivo(Objetivo.PERDIDA_DE_PESO);
+        usuarioMock.setObjetivo("perdida peso" , PERDIDA_DE_PESO);
     }
 
     @Test
     public void queAlIrALaPantallaDeRutinaMeMuestreLaVistaDeRutina() throws Exception {
         // Preparación
-        DatosRutina datosRutinaMock = new DatosRutina(new Rutina("Rutina de correr", Objetivo.PERDIDA_DE_PESO));
+        DatosRutina datosRutinaMock = new DatosRutina(new Rutina("Rutina de correr", PERDIDA_DE_PESO));
 
         when(servicioRutina.getRutinaParaUsuario(usuarioMock)).thenReturn(datosRutinaMock);
 
@@ -78,18 +78,18 @@ public class ControladorRutinaTest {
 
     public void queAlIrALaVistaRutinasMeMuestreRutinasRelacionadasAMiObjetivo(){
         //preparacion
-        usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
+        usuarioMock = new Usuario("Lautaro", PERDIDA_DE_PESO);
 
-        DatosRutina datosRutinaMock1 = new DatosRutina(new Rutina("Rutina de correr",Objetivo.PERDIDA_DE_PESO));
-        DatosRutina datosRutinaMock2 = new DatosRutina(new Rutina("Rutina de trotar",Objetivo.PERDIDA_DE_PESO));
-        DatosRutina datosRutinaMock3 = new DatosRutina(new Rutina("Rutina de caminar",Objetivo.PERDIDA_DE_PESO));
+        DatosRutina datosRutinaMock1 = new DatosRutina(new Rutina("Rutina de correr", PERDIDA_DE_PESO));
+        DatosRutina datosRutinaMock2 = new DatosRutina(new Rutina("Rutina de trotar", PERDIDA_DE_PESO));
+        DatosRutina datosRutinaMock3 = new DatosRutina(new Rutina("Rutina de caminar", PERDIDA_DE_PESO));
 
         List<DatosRutina> datosRutinasMock = new ArrayList<>();
         datosRutinasMock.add(datosRutinaMock1);
         datosRutinasMock.add(datosRutinaMock2);
         datosRutinasMock.add(datosRutinaMock3);
 
-        when(servicioRutina.getRutinasPorObjetivo(Objetivo.PERDIDA_DE_PESO)).thenReturn(datosRutinasMock);
+        when(servicioRutina.getRutinasPorObjetivo(PERDIDA_DE_PESO)).thenReturn(datosRutinasMock);
 
         // Ejecución
         ModelAndView modelAndView = controladorRutina.VerRutinasQueLeInteresanAlUsuario(usuarioMock.getObjetivo().toString());

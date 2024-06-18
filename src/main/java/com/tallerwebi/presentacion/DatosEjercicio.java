@@ -1,17 +1,14 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.objetivo.GrupoMuscularObjetivo;
-import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
 import com.tallerwebi.dominio.rutina.Ejercicio;
-import com.tallerwebi.dominio.rutina.Rutina;
-
-import java.util.List;
 
 public class DatosEjercicio {
 
     private String nombre;
 
-    private Objetivo objetivo;
+    private TipoObjetivo tipoObjetivo;
 
     private GrupoMuscularObjetivo grupoMuscularObjetivo;
 
@@ -24,7 +21,7 @@ public class DatosEjercicio {
 
     public DatosEjercicio(Ejercicio ejercicio){
         this.nombre = ejercicio.getNombre();
-        this.objetivo = ejercicio.getObjetivo();
+        this.tipoObjetivo = ejercicio.getObjetivo();
         this.repeticiones = ejercicio.getRepeticiones();
         this.series = ejercicio.getSeries();
         this.descripcion = ejercicio.getDescripcion();
@@ -39,12 +36,12 @@ public class DatosEjercicio {
         this.nombre = nombre;
     }
 
-    public Objetivo getObjetivo() {
-        return objetivo;
+    public TipoObjetivo getObjetivo() {
+        return tipoObjetivo;
     }
 
-    public void setObjetivo(Objetivo objetivo) {
-        this.objetivo = objetivo;
+    public void setObjetivo(TipoObjetivo tipoObjetivo) {
+        this.tipoObjetivo = tipoObjetivo;
     }
 
     public GrupoMuscularObjetivo getGrupoMuscularObjetivo() {

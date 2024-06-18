@@ -29,18 +29,20 @@
         </div>
     </nav>
 </header>
-<div class="container mt-5">
-    <h2>Definir Objetivos de Entrenamiento</h2>
+<div class="container form-container">
+    <h2 class="text-center">Definir Objetivos de Entrenamiento</h2>
     <form th:action="@{/rutinas}" method="GET">
-        <div class="mb-3">
-            <label for="objetivo" class="form-label">Selecciona tu objetivo:</label>
-            <select class="form-select" id="objetivo" name="objetivo">
-                <option value="PERDIDA_DE_PESO">Pérdida de Peso</option>
-                <option value="GANANCIA_MUSCULAR">Ganancia Muscular</option>
-                <option value="DEFINICION">Definición</option>
-            </select>
+        <div class="form-group text-center">
+            <div th:each="objetivo : ${objetivos}" class="btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-outline-primary btn-option">
+                    <input type="radio" name="objetivoId" th:value="${objetivo.idObjetivo}" autocomplete="off">
+                    <span th:text="${objetivo.nombre}"></span>
+                </label>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Seleccionar Objetivo</button>
+        </div>
     </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>

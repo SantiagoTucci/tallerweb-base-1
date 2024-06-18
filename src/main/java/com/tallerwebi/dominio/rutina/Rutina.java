@@ -1,8 +1,8 @@
 package com.tallerwebi.dominio.rutina;
 
-import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.UsuarioRutina;
 import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
+import com.tallerwebi.dominio.usuarioRutina.UsuarioRutina;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,19 +17,41 @@ public class Rutina {
 
     private String nombre;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "objetivo_id", referencedColumnName = "idObjetivo")
     private Objetivo objetivo;
+
+//    @Enumerated(EnumType.STRING)
+//    private TipoObjetivo tipoObjetivo;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Ejercicio> ejercicios;
+
     public Rutina() {
         this.ejercicios = new ArrayList<>();
     }
 
+//    public Rutina(String nombre, TipoObjetivo tipoObjetivo) {
+//        this.nombre = nombre;
+//        this.tipoObjetivo = tipoObjetivo;
+//        this.ejercicios = new ArrayList<>();
+//    }
+
+
     public Rutina(String nombre, Objetivo objetivo) {
         this.nombre = nombre;
         this.objetivo = objetivo;
-        this.ejercicios = new ArrayList<>();
+    }
+
+    public Rutina(Long idRutina, String nombre, Objetivo objetivo, List<Ejercicio> ejercicios, List<UsuarioRutina> usuarioRutinas) {
+        this.idRutina = idRutina;
+        this.nombre = nombre;
+        this.objetivo = objetivo;
+        this.ejercicios = ejercicios;
+        this.usuarioRutinas = usuarioRutinas;
+    }
+
+    public Rutina(String adelgazar, TipoObjetivo tipoObjetivo) {
     }
 
     @OneToMany(mappedBy = "rutina", cascade = CascadeType.ALL)

@@ -1,12 +1,12 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.usuario;
 
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.objetivo.Objetivo;
-import com.tallerwebi.dominio.rutina.Rutina;
+import com.tallerwebi.dominio.objetivo.TipoObjetivo;
 import com.tallerwebi.dominio.reto.Reto;
+import com.tallerwebi.dominio.usuarioRutina.UsuarioRutina;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,13 +21,14 @@ public class Usuario {
     private String password;
     private String rol;
     private Boolean activo = false;
-    @Enumerated(EnumType.STRING)
-    private Objetivo objetivo;
     private Boolean isInstructor = false;
     @Column(name = "rachaDeRetos", columnDefinition = "INTEGER DEFAULT 0")
     private Integer rachaDeRetos = 0;
     @Column(name = "cambioReto", nullable = false, columnDefinition = "INTEGER DEFAULT 3")
     private Integer cambioReto = 3;
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private Objetivo objetivo;
 
     //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
@@ -58,11 +59,15 @@ public class Usuario {
 
     public Usuario() {
     }
+    
     public Usuario(String nombre, Objetivo objetivo) {
         this.nombre = nombre;
         this.objetivo = objetivo;
     }
 
+    public Usuario(String lautaro, TipoObjetivo tipoObjetivo) {
+    }
+    
     public Usuario(String nombre, String apellido, String email, String password) {
         this.nombre = nombre;
         this.apellido =  apellido;
@@ -95,7 +100,7 @@ public class Usuario {
         this.rachaDeRetos = 0;
         this.cambioReto = 3;
     }
-
+    
     public Long getId() {
         return id;
     }
@@ -151,8 +156,8 @@ public class Usuario {
         this.apellido = apellido;
     }
 
-    public Objetivo getObjetivo() {
-        return objetivo;
+    public TipoObjetivo getObjetivo() {
+        return objetivo.getTipoObjetivo();
     }
 
     public Boolean getInstructor() {
@@ -174,7 +179,7 @@ public class Usuario {
     public void setObjetivo(Objetivo objetivo) {
         this.objetivo = objetivo;
     }
-
+    
     public Boolean isInstructor() {
         return isInstructor;
     }
@@ -200,4 +205,7 @@ public class Usuario {
     }
 
 
+    public void setObjetivo(String perdidaPeso, TipoObjetivo tipoObjetivo) {
+
+    }
 }
