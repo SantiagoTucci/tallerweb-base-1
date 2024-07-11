@@ -72,6 +72,45 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
     }
 
     @Override
+    public ItemRendimiento obtenerItemMasSeleccionadoPorUsuario(Usuario usuario) {
+        // Consulta para obtener el tipo de rendimiento más seleccionado por el usuario
+        String hqlTipoRendimiento = "SELECT ir.tipoRendimiento, COUNT(ir) FROM Usuario u " +
+                "JOIN u.itemsRendimiento ir " +
+                "WHERE u.id = :usuarioId AND ir.tipoRendimiento != :descanso " +
+                "GROUP BY ir.tipoRendimiento " +
+                "ORDER BY COUNT(ir) DESC";
+
+        Object[] tipoRendimientoResult = (Object[]) this.sessionFactory.getCurrentSession()
+                .createQuery(hqlTipoRendimiento)
+                .setParameter("usuarioId", usuario.getId())
+                .setParameter("descanso", TipoRendimiento.DESCANSO)
+                .setMaxResults(1)
+                .uniqueResult();
+
+        if (tipoRendimientoResult == null) {
+            return null;
+        }
+
+        TipoRendimiento tipoRendimientoMasSeleccionado = (TipoRendimiento) tipoRendimientoResult[0];
+
+        // Consulta para obtener el item de rendimiento más reciente del tipo seleccionado por el usuario
+        String hqlItemRendimiento = "SELECT ir FROM Usuario u " +
+                "JOIN u.itemsRendimiento ir " +
+                "WHERE u.id = :usuarioId AND ir.tipoRendimiento = :tipoRendimiento " +
+                "ORDER BY ir.fecha DESC";
+
+        List<ItemRendimiento> items = this.sessionFactory.getCurrentSession()
+                .createQuery(hqlItemRendimiento, ItemRendimiento.class)
+                .setParameter("usuarioId", usuario.getId())
+                .setParameter("tipoRendimiento", tipoRendimientoMasSeleccionado)
+                .setMaxResults(1)
+                .getResultList();
+
+        return items.isEmpty() ? null : items.get(0);
+    }
+
+
+    @Override
     public ItemRendimiento getItemRendimientoDeUsuarioHoyPorId(Long usuarioId) {
         String hql = "SELECT u FROM Usuario u JOIN FETCH u.itemsRendimiento WHERE u.id = :usuarioId";
         Query<Usuario> query = sessionFactory.getCurrentSession().createQuery(hql, Usuario.class);
@@ -90,7 +129,6 @@ public class RepositorioCalendarioImpl implements RepositorioCalendario {
 
         return null;
     }
-
 
     @Override
     public Usuario getUsuarioById(Long id) {

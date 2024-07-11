@@ -32,49 +32,30 @@ public class Usuario {
     private Integer rachaDeRetos = 0;
     @Column(name = "cambioReto", nullable = false, columnDefinition = "INTEGER DEFAULT 3")
     private Integer cambioReto = 3;
-    //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<UsuarioRutina> usuarioRutinas;
-    //relacion de usuario con itemRendimiento 1 - n --> bd
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @BatchSize(size = 10)
     private List<ItemRendimiento> itemsRendimiento;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "perfil_id", referencedColumnName = "idPerfil")
     private Perfil perfil;
-
     @OneToMany(mappedBy = "usuario")
     private List<EstadoEjercicio> estadosEjercicios;
-
-    public List<ItemRendimiento> getItemsRendimiento() {
-        return itemsRendimiento;
-    }
-
-    public void setItemsRendimiento(List<ItemRendimiento> itemsRendimiento) {
-        this.itemsRendimiento = itemsRendimiento;
-    }
-
-    //relacion de usuario con reto 1 - n --> bd
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Reto> retos;
-
-    public List<Reto> getRetos() {
-        return retos;
-    }
-
-    public void setRetos(List<Reto> retos) {
-        this.retos = retos;
-    }
 
     public Usuario() {
         this.usuarioRutinas = new ArrayList<>();
         this.itemsRendimiento = new ArrayList<>();
+        this.retos = new ArrayList<>();
     }
     public Usuario(String nombre, Objetivo objetivo) {
         this.nombre = nombre;
         this.objetivo = objetivo;
         this.usuarioRutinas = new ArrayList<>();
         this.itemsRendimiento = new ArrayList<>();
+        this.retos = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password) {
@@ -84,6 +65,7 @@ public class Usuario {
         this.password = password;
         this.usuarioRutinas = new ArrayList<>();
         this.itemsRendimiento = new ArrayList<>();
+        this.retos = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password, Boolean isInstructor) {
@@ -94,6 +76,7 @@ public class Usuario {
         this.isInstructor = isInstructor;
         this.usuarioRutinas = new ArrayList<>();
         this.itemsRendimiento = new ArrayList<>();
+        this.retos = new ArrayList<>();
     }
 
     public Usuario(String nombre, String apellido, String email, String password, Objetivo objetivo) {
@@ -104,6 +87,7 @@ public class Usuario {
         this.objetivo = objetivo;
         this.usuarioRutinas = new ArrayList<>();
         this.itemsRendimiento = new ArrayList<>();
+        this.retos = new ArrayList<>();
     }
 
     public Usuario(String email, String nombre, String apellido, String password, List<Reto> retos) {
@@ -236,5 +220,21 @@ public class Usuario {
     public void setEstadosEjercicios(List<EstadoEjercicio> estadosEjercicios) {
         this.estadosEjercicios = estadosEjercicios;
 
+    }
+
+    public List<ItemRendimiento> getItemsRendimiento() {
+        return itemsRendimiento;
+    }
+
+    public void setItemsRendimiento(List<ItemRendimiento> itemsRendimiento) {
+        this.itemsRendimiento = itemsRendimiento;
+    }
+
+    public List<Reto> getRetos() {
+        return retos;
+    }
+
+    public void setRetos(List<Reto> retos) {
+        this.retos = retos;
     }
 }

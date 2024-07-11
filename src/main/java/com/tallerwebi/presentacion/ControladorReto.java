@@ -41,10 +41,10 @@ public class ControladorReto {
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId); // Añadir retoId al modelo
         try {
-            servicioReto.empezarRetoActualizado(retoId);
+            servicioReto.empezarRetoActualizadoPorUsuario(retoId, usuario);
 
             // Añadir itemMasSeleccionado al modelo
-            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionadoPorUsuario(usuario);
             if (itemMasSeleccionado == null) {
                 modelAndView.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
             } else {
@@ -53,10 +53,10 @@ public class ControladorReto {
 
 
             // Añadir retoDisponible al modelo
-            Reto retoDisponible = servicioReto.obtenerRetoPorId(retoId);
+            Reto retoDisponible = servicioReto.obtenerRetoPorIdPorUsuario(retoId, usuario);
             if (retoDisponible != null) {
                 modelAndView.addObject("retoDisponible", retoDisponible);
-                long minutosRestantes = servicioReto.calcularTiempoRestante(retoDisponible.getId());
+                long minutosRestantes = servicioReto.calcularTiempoRestantePorUsuario(retoDisponible.getId(), usuario);
                 modelAndView.addObject("minutosRestantes", minutosRestantes);
             }
 
@@ -87,7 +87,7 @@ public class ControladorReto {
         modelAndView.addObject("usuario", usuario); // Asegúrate de agregar el usuario al modelo
         try {
             // Añadir itemMasSeleccionado al modelo
-            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionadoPorUsuario(usuario);
             if (itemMasSeleccionado == null) {
                 modelAndView.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
             } else {
@@ -96,14 +96,14 @@ public class ControladorReto {
 
             session.removeAttribute("retoDisponible");
 
-            Reto retoDisponible = servicioReto.obtenerRetoDisponible();
+            Reto retoDisponible = servicioReto.obtenerRetoDisponiblePorUsuario(usuario);
             if (retoDisponible != null) {
                 modelAndView.addObject("retoDisponible", retoDisponible);
             }
 
             Usuario usuarioBuscado = servicioLogin.consultarUsuario(email, password);
             if (usuarioBuscado != null) {
-                servicioLogin.modificarRachaRetoTerminado(usuarioBuscado, retoId);
+                servicioLogin.modificarRachaRetoTerminadoPorUsuario(usuarioBuscado, retoId);
                 modelAndView.addObject("usuario", usuarioBuscado);
                 session.setAttribute("usuario", usuarioBuscado);
             }
@@ -129,7 +129,7 @@ public class ControladorReto {
         ModelAndView modelAndView = new ModelAndView("home");
         modelAndView.addObject("retoId", retoId);
         try {
-            Reto nuevoReto = servicioLogin.cambiarReto(retoId, usuario);
+            Reto nuevoReto = servicioLogin.cambiarRetoPorUsuario(retoId, usuario);
             if (nuevoReto != null) {
                 redirectAttributes.addFlashAttribute("retoDisponible", nuevoReto);
                 session.setAttribute("retoDisponible", nuevoReto);

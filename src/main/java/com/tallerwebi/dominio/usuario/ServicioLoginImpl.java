@@ -53,11 +53,26 @@ public class ServicioLoginImpl implements ServicioLogin {
     }
 
     @Override
+    public DatosItemRendimiento obtenerItemMasSeleccionadoPorUsuario(Usuario usuario) {
+        return servicioCalendario.obtenerItemMasSeleccionadoPorUsuario(usuario);
+    }
+
+    @Override
     public Reto obtenerRetoDisponible(){return servicioReto.obtenerRetoDisponible();}
+
+    @Override
+    public Reto obtenerRetoDisponiblePorUsuario(Usuario usuario) {
+        return servicioReto.obtenerRetoDisponiblePorUsuario(usuario);
+    }
 
     @Override
     public Reto obtenerRetoEnProceso() {
         return servicioReto.obtenerRetoEnProceso();
+    }
+
+    @Override
+    public Reto obtenerRetoEnProcesoDeUsuario(Usuario usuario) {
+        return servicioReto.obtenerRetoEnProcesoDeUsuario(usuario);
     }
 
     @Override
@@ -76,8 +91,28 @@ public class ServicioLoginImpl implements ServicioLogin {
     }
 
     @Override
+    public Usuario modificarRachaRetoTerminadoPorUsuario(Usuario usuario, long retoId) {
+        long diasPasados = servicioReto.terminarRetoPorUsuario(retoId, usuario);
+        if (usuario != null) {
+            if (diasPasados < 2) {
+                usuario.sumarRacha();
+                repositorioUsuario.modificar(usuario);
+            } else {
+                usuario.setRachaDeRetos(0); // Resetear la racha
+                repositorioUsuario.modificar(usuario); // Actualizar el usuario en el repositorio
+            }
+        }
+        return usuario;
+    }
+
+    @Override
     public long calcularTiempoRestante(Long id) {
         return servicioReto.calcularTiempoRestante(id);
+    }
+
+    @Override
+    public long calcularTiempoRestantePorUsuario(Long id, Usuario usuario) {
+        return servicioReto.calcularTiempoRestantePorUsuario(id, usuario);
     }
 
     @Override
@@ -89,6 +124,27 @@ public class ServicioLoginImpl implements ServicioLogin {
             }
 
             Reto nuevoReto = servicioReto.obtenerRetoDisponible();
+            if (nuevoReto != null) {
+                usuario.setCambioReto(usuario.getCambioReto() - 1);
+                repositorioUsuario.modificar(usuario);
+            } else {
+                throw new NoSuchElementException("No se encontró un nuevo reto disponible.");
+            }
+            return nuevoReto;
+        } else {
+            throw new NoCambiosRestantesException("No te quedan cambios. Debes terminar los retos.");
+        }
+    }
+
+    @Override
+    public Reto cambiarRetoPorUsuario(Long retoId, Usuario usuario) {
+        if (usuario.getCambioReto() > 0) {
+            Reto retoActual = servicioReto.obtenerRetoPorIdPorUsuario(retoId, usuario);
+            if (retoActual != null) {
+                servicioReto.cambiarRetoPorUsuario(retoActual, usuario);
+            }
+
+            Reto nuevoReto = servicioReto.obtenerRetoDisponiblePorUsuario(usuario);
             if (nuevoReto != null) {
                 usuario.setCambioReto(usuario.getCambioReto() - 1);
                 repositorioUsuario.modificar(usuario);
