@@ -73,64 +73,63 @@
 
     <div class="row mt-3 mb-3">
         <div class="col-md-12">
-            <div class="card">
+            <div class="bg-white shadow-md rounded-lg overflow-hidden p-4">
                 <div class="card-header text-center">
-                    <h2 th:text="${rutina.nombre}"></h2>
+                    <h2 class="text-xl font-bold text-gray-900 text-center" th:text="${rutina.nombre}"></h2>
                 </div>
                 <div class="card-body">
-                    <p th:text="${rutina.descripcion}"></p>
-                    <ul class="list-group">
-                        <li class="list-group-item" th:each="ejercicio : ${rutina.ejercicios}">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p th:text="${ejercicio.nombre}" style="font-weight: bold"></p>
-                                    <p th:text="${ejercicio.descripcion}"></p>
+                    <p class="text-gray-700" th:text="${rutina.descripcion}"></p>
+                    <ul class="divide-y divide-gray-200">
+                        <li th:each="ejercicio : ${rutina.ejercicios}" class="py-4">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                <div class="mb-4 md:mb-0 md:w-1/2">
+                                    <p class="font-semibold text-gray-700" th:text="${ejercicio.nombre}"></p>
+                                    <p class="text-gray-600" th:text="${ejercicio.descripcion}"></p>
                                 </div>
-                                <div class="col-md-6 text-end">
-                                    <p th:text="${ejercicio.series + 'x' + ejercicio.repeticiones}"></p>
+                                <div class="md:w-1/2 md:text-right">
+                                    <p class="text-gray-600" th:text="${ejercicio.series + 'x' + ejercicio.repeticiones}"></p>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <form th:action="@{/actualizar-estado-ejercicio}" method="post">
-                                        <!-- Hidden input for ejercicio id -->
-                                        <input type="hidden" name="idEjercicio" th:value="${ejercicio.idEjercicio}" />
+                            <div class="mt-2 md:mt-0">
+                                <form th:action="@{/actualizar-estado-ejercicio}" method="post" class="p-4">
+                                    <!-- Hidden input for ejercicio id -->
+                                    <input type="hidden" name="idEjercicio" th:value="${ejercicio.idEjercicio}" />
 
-                                        <!-- Find corresponding estadoEjercicio for the current ejercicio -->
-                                        <th:block th:each="estado : ${estadosEjercicios}">
-                                            <th:block th:if="${estado.ejercicio.idEjercicio == ejercicio.idEjercicio}">
-                                                <p>Estado actual:
-                                                    <span th:text="${estado.estado.toString().replace('_',' ')}"
-                                                          th:class="${estado.estado.toString() == 'COMPLETO' ? 'estado-completo' :
-                                                                 (estado.estado.toString() == 'INCOMPLETO' ? 'estado-incompleto' :
-                                                                 'estado-no-empezado')}">
-                                                </span>
-                                                </p>
-                                            </th:block>
-
-                                            <th:block th:if="${estado.ejercicio.idEjercicio == ejercicio.idEjercicio}">
-                                                <select name="estado">
-                                                    <option th:value="NO_EMPEZADO" th:selected="${estado.estado.toString() == 'NO_EMPEZADO'}"
-                                                            th:classappend="${estado.estado.toString() == 'NO_EMPEZADO' ? 'estado-no-empezado' : ''}">NO EMPEZADO</option>
-                                                    <option th:value="INCOMPLETO" th:selected="${estado.estado.toString() == 'INCOMPLETO'}"
-                                                            th:classappend="${estado.estado.toString() == 'INCOMPLETO' ? 'estado-incompleto' : ''}">INCOMPLETO</option>
-                                                    <option th:value="COMPLETO" th:selected="${estado.estado.toString() == 'COMPLETO'}"
-                                                            th:classappend="${estado.estado.toString() == 'COMPLETO' ? 'estado-completo' : ''}">COMPLETO</option>
-                                                </select>
-                                            </th:block>
-
+                                    <!-- Find corresponding estadoEjercicio for the current ejercicio -->
+                                    <th:block th:each="estado : ${estadosEjercicios}">
+                                        <th:block th:if="${estado.ejercicio.idEjercicio == ejercicio.idEjercicio}">
+                                            <p>Estado actual:
+                                                <span th:text="${estado.estado.toString().replace('_',' ')}"
+                                                      th:class="${estado.estado.toString() == 'COMPLETO' ? 'estado-completo' :
+                                                         (estado.estado.toString() == 'INCOMPLETO' ? 'estado-incompleto' :
+                                                         'estado-no-empezado')}">
+                                            </span>
+                                            </p>
                                         </th:block>
 
-                                        <button type="submit" class="btn btn-primary">Actualizar estado</button>
-                                    </form>
-                                </div>
+                                        <th:block th:if="${estado.ejercicio.idEjercicio == ejercicio.idEjercicio}">
+                                            <select name="estado"
+                                                    class="form-control mt-2 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+                                                    th:value="${estado.estado.toString()}">
+                                                <option value="NO_EMPEZADO"
+                                                        th:selected="${estado.estado.toString() == 'NO_EMPEZADO'}">NO EMPEZADO</option>
+                                                <option value="INCOMPLETO"
+                                                        th:selected="${estado.estado.toString() == 'INCOMPLETO'}">INCOMPLETO</option>
+                                                <option value="COMPLETO"
+                                                        th:selected="${estado.estado.toString() == 'COMPLETO'}">COMPLETO</option>
+                                            </select>
+                                        </th:block>
+                                    </th:block>
+
+                                    <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Actualizar estado</button>
+                                </form>
                             </div>
                         </li>
                     </ul>
-                    <div class="text-center mt-3">
+                    <div class="text-center mt-4">
                         <form th:action="@{/calcular-rendimiento}" method="post">
-                            <input type="hidden" name="rutina" th:value="${rutina.getId()}">
-                            <button type="submit" class="btn btn-success">Cargar rendimiento</button>
+                            <input type="hidden" name="rutina" th:value="${rutina.id}" />
+                            <button type="submit" class="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600">Cargar rendimiento</button>
                         </form>
                     </div>
                 </div>

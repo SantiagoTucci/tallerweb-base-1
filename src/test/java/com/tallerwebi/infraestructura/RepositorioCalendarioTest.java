@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.calendario.ItemRendimiento;
 import com.tallerwebi.dominio.calendario.RepositorioCalendario;
 import com.tallerwebi.dominio.calendario.TipoRendimiento;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.infraestructura.config.HibernateTestInfraestructuraConfig;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -30,6 +31,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 @ExtendWith(SpringExtension.class)
@@ -131,6 +133,56 @@ public class RepositorioCalendarioTest {
         // verificacion
         boolean noExiste = this.repositorioCalendario.existeItemRendimientoPorFecha(LocalDate.of(2024, Month.JUNE, 15));
         assertThat(noExiste, equalTo(false));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void dadoQueNoHayItemsDeberiaDevolverNull() {
+        // preparacion
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        // ejecucion
+        ItemRendimiento resultado = repositorioCalendario.obtenerItemMasSeleccionadoPorUsuario(usuario);
+
+        // verificacion
+        assertThat(resultado, equalTo(null));
+    }
+
+    public Usuario dadoQueExistenItemsRendimientoGuardadosEnUnUsuarioLaBaseDeDatos() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        sessionFactory.getCurrentSession().save(usuario);
+
+        // Crear los objetos ItemRendimiento con diferentes fechas
+        ItemRendimiento itemRendimiento1 = new ItemRendimiento(LocalDate.now().minusDays(2), TipoRendimiento.NORMAL);
+        ItemRendimiento itemRendimiento2 = new ItemRendimiento(LocalDate.now().minusDays(1), TipoRendimiento.DESCANSO);
+        ItemRendimiento itemRendimiento3 = new ItemRendimiento(LocalDate.now(), TipoRendimiento.BAJO);
+        ItemRendimiento itemRendimiento4 = new ItemRendimiento(LocalDate.now().minusDays(12), TipoRendimiento.NORMAL);
+
+        // Guardar los objetos en el repositorio
+        this.repositorioCalendario.guardarRendimientoEnUsuario(itemRendimiento1, usuario);
+        this.repositorioCalendario.guardarRendimientoEnUsuario(itemRendimiento2, usuario);
+        this.repositorioCalendario.guardarRendimientoEnUsuario(itemRendimiento3, usuario);
+        this.repositorioCalendario.guardarRendimientoEnUsuario(itemRendimiento4, usuario);
+
+
+        return usuario;
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void dadoQueHayItemsDeberiaDevolverElItemMasReciente() {
+        // preparacion
+        Usuario usuarioTest = dadoQueExistenItemsRendimientoGuardadosEnUnUsuarioLaBaseDeDatos();
+
+        // ejecucion
+        ItemRendimiento resultado = repositorioCalendario.obtenerItemMasSeleccionadoPorUsuario(usuarioTest);
+
+        // verificacion
+        assertThat(resultado.getTipoRendimiento(), equalTo(TipoRendimiento.NORMAL));
     }
 
 }
