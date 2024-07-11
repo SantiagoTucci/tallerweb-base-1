@@ -25,28 +25,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Obtener los detalles de los platos específicos
-    function loadMealsByIds(ids) {
+    // Función para cargar las comidas por IDs
+    async function loadMealsByIds(ids) {
         let html = '';
-        ids.forEach(id => {
-            fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    const meal = data.meals[0];
-                    html += `
-                        <div class="meal-item" data-id="${meal.idMeal}">
-                            <div class="meal-img">
-                                <img src="${meal.strMealThumb}" alt="food">
-                            </div>
-                            <div class="meal-name">
-                                <h3>${meal.strMeal}</h3>
-                                <a href="#" class="recipe-btn">Get Recipe</a>
-                            </div>
-                        </div>
-                    `;
-                    mealList.innerHTML = html;
-                })
-                .catch(error => console.error("Error fetching meal details:", error));
-        });
+        for (const id of ids) {
+            try {
+                const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
+                const data = await response.json();
+                const meal = data.meals[0];
+
+                // Traducir el nombre y las instrucciones
+                const translatedMealName = await translateText(meal.strMeal, 'en', 'es');
+                const translatedInstructions = await translateText(meal.strInstructions, 'en', 'es');
+
+                html += `
+                <div class="meal-item" data-id="${meal.idMeal}">
+                    <div class="meal-img">
+                        <img src="${meal.strMealThumb}" alt="food">
+                    </div>
+                    <div class="meal-name">
+                        <h3>${translatedMealName}</h3>
+                        <a href="#" class="recipe-btn">Ver Receta</a>
+                    </div>
+                </div>
+            `;
+            } catch (error) {
+                console.error("Error fetching meal details:", error);
+            }
+        }
+        mealList.innerHTML = html;
     }
 
     // Obtener receta de la comida
@@ -89,5 +96,28 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error("Objective not found:", userObjective);
         mealList.innerHTML = "No se encontraron platos para el objetivo seleccionado.";
+    }
+
+    // Función para traducir texto utilizando MyMemory API
+    async function translateText(text, sourceLang, targetLang) {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Error en la respuesta: ${errorText}`);
+            }
+            const data = await response.json();
+            if (data.responseData && data.responseData.translatedText) {
+                console.log(`Texto traducido (${sourceLang} a ${targetLang}):`, data.responseData.translatedText);
+                return data.responseData.translatedText;
+            } else {
+                console.error('Error en la traducción:', data);
+                return text;
+            }
+        } catch (error) {
+            console.error('Error en la traducción:', error);
+            return text;
+        }
     }
 });
