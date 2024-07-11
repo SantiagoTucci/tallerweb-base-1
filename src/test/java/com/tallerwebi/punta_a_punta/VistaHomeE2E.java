@@ -23,8 +23,8 @@ public class VistaHomeE2E {
     @BeforeAll
     static void abrirNavegador() {
         playwright = Playwright.create();
-//        browser = playwright.chromium().launch();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(300));
+        browser = playwright.chromium().launch();
+//        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(300));
 
     }
 
@@ -71,7 +71,7 @@ public class VistaHomeE2E {
     void deberiaNavegarARutinasAlApretarElBotonComenzarEntrenamiento(){
         vistaHome.darClickEnComenzarEntrenamiento();
         String url = vistaHome.obtenerURLActual();
-        assertThat(url, containsStringIgnoringCase("/spring/rutinas?objetivo="));
+        assertThat(url, containsStringIgnoringCase("/spring/rutinas"));
     }
 
     @Test

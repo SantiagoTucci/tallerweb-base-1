@@ -2,6 +2,8 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.alimentacion.ServicioAlimentacion;
 
+import com.tallerwebi.dominio.objetivo.Objetivo;
+import com.tallerwebi.dominio.rutina.ServicioRutina;
 import com.tallerwebi.dominio.usuario.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ public class ControladorAlimentacionTest {
     private ServicioAlimentacion servicioAlimentacion;
     private ControladorAlimentacion controladorAlimentacion;
     private MockMvc mockMvc;
+    private ServicioRutina servicioRutina;
 
     @BeforeEach
     public void init() {
@@ -28,17 +31,33 @@ public class ControladorAlimentacionTest {
     }
 
     @Test
-    public void queAlIrALaPantallaDeAlimentacionMeMuestreLaVistaDeAlimentacion() {
-        // Crear un usuario simulado y una sesión simulada
-        Usuario usuarioSimulado = new Usuario();
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioSimulado);
+    public void queAlIrALaPantallaDeAlimentacionSinObjetivoDefinidoMeRedirijaAObjetivo() {
+        // Preparación
+        Usuario usuarioSinObjetivo = new Usuario();
+        usuarioSinObjetivo.setObjetivo(null);
 
+        // Configuración de la sesión
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("usuario", usuarioSinObjetivo);
+
+        // Invocar el método del controlador con la sesión simulada
+        ModelAndView modelAndView = controladorAlimentacion.irAlimentacion(session);
+
+        // Verificar que el nombre de la vista sea "alimentacion"
+        assertThat(modelAndView.getViewName(), equalTo("redirect:/objetivo"));
+    }
+
+    @Test
+    public void queAlIrALaPantallaDeAlimentacionTeniendoObjetivoRedirijaAObjetivo() {
+        // Crear un usuario simulado y una sesión simulada
+        Usuario usuarioConObjetivo = new Usuario();
+        usuarioConObjetivo.setObjetivo(Objetivo.GANANCIA_MUSCULAR);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("usuario", usuarioConObjetivo);
         // Invocar el método del controlador con la sesión simulada
         ModelAndView modelAndView = controladorAlimentacion.irAlimentacion(session);
 
         // Verificar que el nombre de la vista sea "alimentacion"
         assertThat(modelAndView.getViewName(), equalTo("alimentacion"));
     }
-
 }
