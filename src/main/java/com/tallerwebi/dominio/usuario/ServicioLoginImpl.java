@@ -53,6 +53,11 @@ public class ServicioLoginImpl implements ServicioLogin {
     }
 
     @Override
+    public DatosItemRendimiento obtenerItemMasSeleccionadoPorUsuario(Usuario usuario) {
+        return servicioCalendario.obtenerItemMasSeleccionadoPorUsuario(usuario);
+    }
+
+    @Override
     public Reto obtenerRetoDisponible(){return servicioReto.obtenerRetoDisponible();}
 
     @Override

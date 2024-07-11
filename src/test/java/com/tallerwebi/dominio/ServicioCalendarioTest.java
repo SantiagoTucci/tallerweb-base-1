@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
+import com.tallerwebi.dominio.usuario.Usuario;
 import com.tallerwebi.presentacion.DatosItemRendimiento;
 import com.tallerwebi.dominio.calendario.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,6 +109,39 @@ public class ServicioCalendarioTest {
 
         // verificación
         assertNull(itemMasSeleccionado);
+    }
+
+    @Test
+    public void seDebePoderObtenerItemMasSeleccionadoPorUsuario() {
+        // Preparación
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        List<ItemRendimiento> itemsMock = dadoQueExistenItemsRendimientoGuardadosEnLaBaseDeDatos();
+        when(repositorioCalendario.obtenerItemMasSeleccionadoPorUsuario(any(Usuario.class)))
+                .thenReturn(itemsMock.get(0));
+
+        // Ejecución
+        DatosItemRendimiento resultado = servicioCalendario.obtenerItemMasSeleccionadoPorUsuario(usuario);
+
+        // Verificación
+        assertEquals(itemsMock.get(0).getTipoRendimiento(), resultado.getTipoRendimiento());
+    }
+
+    @Test
+    public void seDebePoderObtenerNullEnItemMasSeleccionadoPorUsuarioCuandoNoHayItems() {
+        // Preparación
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        when(repositorioCalendario.obtenerItemMasSeleccionadoPorUsuario(any(Usuario.class)))
+                .thenReturn(null);
+
+        // Ejecución
+        DatosItemRendimiento resultado = servicioCalendario.obtenerItemMasSeleccionadoPorUsuario(usuario);
+
+        // Verificación
+        assertNull(resultado);
     }
 
 }

@@ -86,7 +86,7 @@ public class ControladorLogin {
         session.setAttribute("usuario", usuario);
 
         // Añadir itemMasSeleccionado al modelo
-        DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+        DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionadoPorUsuario(usuario);
         if (itemMasSeleccionado == null) {
             modelAndView.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
         } else {

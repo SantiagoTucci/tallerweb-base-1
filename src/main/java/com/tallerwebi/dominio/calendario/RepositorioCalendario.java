@@ -23,6 +23,8 @@ public interface RepositorioCalendario {
 
         ItemRendimiento obtenerItemMasSeleccionado();
 
-        ItemRendimiento getItemRendimientoDeUsuarioHoyPorId(Long id);
+    ItemRendimiento obtenerItemMasSeleccionadoPorUsuario(Usuario usuario);
+
+    ItemRendimiento getItemRendimientoDeUsuarioHoyPorId(Long id);
 
 }
