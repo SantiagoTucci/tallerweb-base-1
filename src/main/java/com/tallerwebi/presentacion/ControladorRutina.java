@@ -110,32 +110,37 @@ public class ControladorRutina {
     @RequestMapping(path = "/asignar-rutina", method = RequestMethod.GET)
     public ModelAndView asignarRutina(@RequestParam("id") Long id, HttpSession session) {
         ModelAndView modelAndView = new ModelAndView();
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario == null) {
+            return new ModelAndView("redirect:/login");
+        }
 
         try {
-            Usuario usuario = (Usuario) session.getAttribute("usuario");
+
             modelAndView.addObject("usuario", usuario);
             Rutina rutina = servicioRutina.getRutinaById(id);
             DatosRutina datosRutina = servicioRutina.getDatosRutinaById(id);
 
-            if (usuario != null && rutina != null) {
+            if (rutina != null) {
                 servicioRutina.asignarRutinaAUsuario(rutina, usuario);
 
                 modelAndView.addObject("rutina", datosRutina);
                 modelAndView.setViewName("redirect:/mi-rutina");
             } else {
                 // Si el usuario o la rutina no existen, redirigir a la página de rutinas
-                modelAndView.setViewName("redirect:/objetivo");
+                modelAndView.setViewName("redirect:/rutinas");
             }
         } catch (Exception e) {
             // Si ocurre una excepción, redirigir a la página de rutinas
-            modelAndView.setViewName("redirect:/objetivo");
+            modelAndView.setViewName("redirect:/rutinas");
         }
 
         return modelAndView;
     }
 
     @PostMapping("/liberar-rutina")
-    public ModelAndView liberarRutina(HttpSession session) {
+    public ModelAndView liberarRutina(@RequestParam("id") Long id, HttpSession session) {
         ModelAndView modelAndView = new ModelAndView();
 
         try {
