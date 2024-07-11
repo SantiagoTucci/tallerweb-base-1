@@ -44,7 +44,7 @@ public class ControladorReto {
             servicioReto.empezarRetoActualizado(retoId);
 
             // Añadir itemMasSeleccionado al modelo
-            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionadoPorUsuario(usuario);
             if (itemMasSeleccionado == null) {
                 modelAndView.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
             } else {
@@ -87,7 +87,7 @@ public class ControladorReto {
         modelAndView.addObject("usuario", usuario); // Asegúrate de agregar el usuario al modelo
         try {
             // Añadir itemMasSeleccionado al modelo
-            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionado();
+            DatosItemRendimiento itemMasSeleccionado = servicioLogin.obtenerItemMasSeleccionadoPorUsuario(usuario);
             if (itemMasSeleccionado == null) {
                 modelAndView.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
             } else {
