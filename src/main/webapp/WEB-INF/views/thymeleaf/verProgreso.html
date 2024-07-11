@@ -35,7 +35,7 @@
             <li><a th:action="@{/irAHome}" href="home" class="font-semibold">Inicio</a></li>
             <li><a th:action="@{/irAMiRutina}" href="mi-rutina" class="font-semibold">Rutina</a></li>
             <li><a th:action="@{/irAlimentacion}" href="alimentacion" class="font-semibold">Alimentación</a></li>
-            <li><a th:action="@{/irCalendario}" href="verProgreso" class="font-semibold">Calendario</a></li>
+            <li><a th:action="@{/verProgreso}" href="verProgreso" class="font-semibold">Calendario</a></li>
         </ul>
     </nav>
 
@@ -60,10 +60,9 @@
         <a th:action="@{/irAHome}" href="home" class="hover:bg-blue-500 p-2 rounded text-white">Inicio</a>
         <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-blue-500 p-2 rounded text-white">Rutina</a>
         <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-blue-500 p-2 rounded text-white">Alimentación</a>
-        <a th:action="@{/irCalendario}" href="calendario" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
+        <a th:action="@{/verProgreso}" href="verProgreso" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
     </nav>
 </div>
-
 <div class="p-5">
     <p th:if="${param.info != null}" class="alert alert-info" th:text="${param.info}"></p>
 </div>

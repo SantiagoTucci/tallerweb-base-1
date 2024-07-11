@@ -66,16 +66,15 @@ public class ControladorCalendario {
             return new ModelAndView("redirect:/login");
         }
 
+        if (usuario.getObjetivo() == null) {
+            return new ModelAndView("redirect:/objetivo");
+        }
+
         ModelAndView model = new ModelAndView("verProgreso");
         List<DatosItemRendimiento> itemsRendimiento = servicioCalendario.getItemsRendimientoDeUsuario(usuario);
-        if (itemsRendimiento.isEmpty()) {
-            model.addObject("mensaje", "¿Cómo fue tu entrenamiento hoy?");
-            model.addObject("sinRendimiento", true); // Atributo para indicar que no hay items de rendimiento
-        } else {
-            model.addObject("datosItemRendimiento", itemsRendimiento);
-            model.addObject("sinRendimiento", false); // Atributo para indicar que sí hay items de rendimiento
-        }
+        model.addObject("datosItemRendimiento", itemsRendimiento);
         model.addObject("usuario", usuario); // Agregar el usuario al modelo
+
         return model;
     }
 
