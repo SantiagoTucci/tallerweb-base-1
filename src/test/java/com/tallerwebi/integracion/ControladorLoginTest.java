@@ -6,6 +6,7 @@ import com.tallerwebi.dominio.usuario.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,10 +40,11 @@ public class ControladorLoginTest {
 
 
 	@BeforeEach
-	public void init(){
-		usuarioMock = mock(Usuario.class);
-		when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
+	public void init() {
+		MockitoAnnotations.openMocks(this);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+		usuarioMock = new Usuario();
+		usuarioMock.setEmail("dami@unlam.com");
 	}
 
 	@Test

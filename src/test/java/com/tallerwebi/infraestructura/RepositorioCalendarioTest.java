@@ -29,8 +29,7 @@ import java.util.List;
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -174,7 +173,7 @@ public class RepositorioCalendarioTest {
     @Test
     @Transactional
     @Rollback
-    public void dadoQueHayItemsDeberiaDevolverElItemMasReciente() {
+    public void dadoQueHayItemsEnUnUsuarioDeberiaDevolverElItemMasSeleccionado() {
         // preparacion
         Usuario usuarioTest = dadoQueExistenItemsRendimientoGuardadosEnUnUsuarioLaBaseDeDatos();
 
@@ -183,6 +182,27 @@ public class RepositorioCalendarioTest {
 
         // verificacion
         assertThat(resultado.getTipoRendimiento(), equalTo(TipoRendimiento.NORMAL));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void queSeLogreGuardarRendimientoEnUsuarioYGetItemsRendimientoDeUsuario() {
+        // preparacion
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        sessionFactory.getCurrentSession().save(usuario);
+        ItemRendimiento rendimiento = new ItemRendimiento(LocalDate.now(), TipoRendimiento.ALTO);
+
+        // ejecucion
+        repositorioCalendario.guardarRendimientoEnUsuario(rendimiento, usuario);
+
+        List<ItemRendimiento> itemsRendimiento = repositorioCalendario.getItemsRendimientoDeUsuario(usuario);
+
+        // verificacion
+        assertNotNull(itemsRendimiento);
+        assertEquals(1, itemsRendimiento.size());
+        assertEquals(rendimiento.getTipoRendimiento(), itemsRendimiento.get(0).getTipoRendimiento());
     }
 
 }
