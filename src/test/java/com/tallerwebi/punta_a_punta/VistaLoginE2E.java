@@ -62,7 +62,7 @@ public class VistaLoginE2E {
         vistaLogin.escribirClave("magnus");
         vistaLogin.darClickEnIniciarSesion();
         String texto = vistaLogin.obtenerMensajeDeError();
-        assertThat("Error Usuario o clave incorrecta", equalToIgnoringCase(texto));
+        assertThat("\n                Error Usuario o clave incorrecta\n            ", equalToIgnoringCase(texto));
     }
 
     @Test

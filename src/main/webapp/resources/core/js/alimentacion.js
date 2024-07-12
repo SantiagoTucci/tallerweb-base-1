@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mealDetailsContent.parentElement.classList.remove('showRecipe');
     });
 
-    // Obtener los detalles de los platos específicos
+// Obtener los detalles de los platos específicos
     function loadMealsByIds(ids) {
         let html = '';
         ids.forEach(id => {
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="meal-name">
                                 <h3>${meal.strMeal}</h3>
-                                <a href="#" class="recipe-btn">Get Recipe</a>
+                                <a href="#" class="recipe-btn">Ver receta</a>
                             </div>
                         </div>
                     `;
@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .catch(error => console.error("Error fetching meal details:", error));
         });
+
     }
 
     // Obtener receta de la comida
@@ -68,14 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2 class="recipe-title">${meal.strMeal}</h2>
             <p class="recipe-category">${meal.strCategory}</p>
             <div class="recipe-instruct">
-                <h3>Instructions:</h3>
+                <h3>Instrucciones:</h3>
                 <p>${meal.strInstructions}</p>
             </div>
             <div class="recipe-meal-img">
                 <img src="${meal.strMealThumb}" alt="">
             </div>
             <div class="recipe-link">
-                <a href="${meal.strYoutube}" target="_blank">Watch Video</a>
+                <a href="${meal.strYoutube}" target="_blank">Ver Video</a>
             </div>
         `;
         mealDetailsContent.innerHTML = html;
@@ -90,4 +91,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Objective not found:", userObjective);
         mealList.innerHTML = "No se encontraron platos para el objetivo seleccionado.";
     }
-});
+})

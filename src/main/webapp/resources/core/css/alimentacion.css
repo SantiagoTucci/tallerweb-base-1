@@ -27,11 +27,18 @@
     font-size: 1.05rem;
 }
 .text{
-    opacity: 0.8;
+    /*opacity: 0.8;*/
 }
 .title{
-    font-size: 2rem;
+    font-size: 2.3rem;
     margin-bottom: 1rem;
+    color: black;
+    font-weight: bold;
+}
+.link-rutina{
+    --tw-text-opacity: 1;
+    color: rgba(59, 130, 246, var(--tw-text-opacity));
+    hover:underline;
 }
 
 /*  */

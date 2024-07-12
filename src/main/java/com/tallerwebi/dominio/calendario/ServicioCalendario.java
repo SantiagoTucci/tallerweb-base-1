@@ -12,6 +12,9 @@ public interface ServicioCalendario {
     List<DatosItemRendimiento> obtenerItemsRendimiento();
     void guardarItemRendimiento(ItemRendimiento itemRendimiento);
     DatosItemRendimiento obtenerItemMasSeleccionado();
+
+    DatosItemRendimiento obtenerItemMasSeleccionadoPorUsuario(Usuario usuario);
+
     void guardarItemRendimientoEnUsuario(ItemRendimiento itemRendimiento, Usuario usuario) throws UsuarioYaCargoSuRendimientoDelDiaException;
 
     List<DatosItemRendimiento> getItemsRendimientoDeUsuario(Usuario usuario);

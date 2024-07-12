@@ -32,7 +32,7 @@
             <li><a th:action="@{/irAHome}" href="home" class="font-semibold">Inicio</a></li>
             <li><a th:action="@{/irAMiRutina}" href="mi-rutina" class="font-semibold">Rutina</a></li>
             <li><a th:action="@{/irAlimentacion}" href="alimentacion" class="font-semibold">Alimentación</a></li>
-            <li><a th:action="@{/irCalendario}" href="calendario" class="font-semibold">Calendario</a></li>
+            <li><a th:action="@{/verProgreso}" href="verProgreso" class="font-semibold">Calendario</a></li>
         </ul>
     </nav>
 
@@ -57,17 +57,17 @@
         <a th:action="@{/irAHome}" href="home" class="hover:bg-blue-500 p-2 rounded text-white">Inicio</a>
         <a th:action="@{/irAMiRutina}" href="mi-rutina" class="hover:bg-blue-500 p-2 rounded text-white">Rutina</a>
         <a th:action="@{/irAlimentacion}" href="alimentacion" class="hover:bg-blue-500 p-2 rounded text-white">Alimentación</a>
-        <a th:action="@{/irCalendario}" href="verProgreso" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
+        <a th:action="@{/verProgreso}" href="verProgreso" class="hover:bg-blue-500 p-2 rounded text-white">Calendario</a>
     </nav>
 </div>
 <div class="custom-container custom-mt-5">
     <h2 class="text-center text-2xl md:text-3xl lg:text-4xl mb-8">Definir Objetivos de Entrenamiento</h2>
     <div class="custom-row">
         <div class="custom-col custom-col-sm-6 custom-col-md-4">
-            <div class="custom-card custom-objetivo-card" data-value="PERDIDA_DE_PESO">
+            <div id="card-perder-peso" class="custom-card custom-objetivo-card" data-value="PERDIDA_DE_PESO">
                 <img th:src="@{/img/objetivo/perdidaPeso.png}" alt="Pérdida de Peso" class="custom-card-img-top">
                 <div class="custom-card-body">
-                    <h3 class="custom-card-title">Pérdida de Peso</h3>
+                    <h3 id="perder-peso" class="custom-card-title">Pérdida de Peso</h3>
                     <p class="custom-card-text">Reduce tu peso corporal y mejora tu salud.</p>
                 </div>
             </div>

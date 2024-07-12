@@ -25,8 +25,8 @@ public class VistaCalendarioE2E {
     @BeforeAll
     static void abrirNavegador() {
         playwright = Playwright.create();
-//        browser = playwright.chromium().launch();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(300));
+        browser = playwright.chromium().launch();
+//        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(300));
 
     }
 

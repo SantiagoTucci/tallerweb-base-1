@@ -13,6 +13,8 @@ public interface ServicioLogin {
 
     DatosItemRendimiento obtenerItemMasSeleccionado();
 
+    DatosItemRendimiento obtenerItemMasSeleccionadoPorUsuario(Usuario usuario);
+
     Reto obtenerRetoDisponible();
     Reto obtenerRetoEnProceso();
 

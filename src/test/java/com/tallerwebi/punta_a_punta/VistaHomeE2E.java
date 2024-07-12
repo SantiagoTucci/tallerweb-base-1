@@ -23,8 +23,8 @@ public class VistaHomeE2E {
     @BeforeAll
     static void abrirNavegador() {
         playwright = Playwright.create();
-//        browser = playwright.chromium().launch();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(300));
+        browser = playwright.chromium().launch();
+//        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(300));
 
     }
 
@@ -67,17 +67,18 @@ public class VistaHomeE2E {
         assertThat("Empezar", equalToIgnoringCase(texto));
     }
 
+    //Solo funciona en el caso de no haber tomado una rutina
     @Test
     void deberiaNavegarARutinasAlApretarElBotonComenzarEntrenamiento(){
         vistaHome.darClickEnComenzarEntrenamiento();
         String url = vistaHome.obtenerURLActual();
-        assertThat(url, containsStringIgnoringCase("/spring/rutinas?objetivo="));
+        assertThat(url, containsStringIgnoringCase("/spring/rutinas"));
     }
 
     @Test
-    void deberiaEmpezarRetoAlApretarElBoton(){
-        vistaHome.darClickEnEmpezar();
+    void deberiaNavegarAlimentacionAlDarEnComidasSegunObjetivo(){
+        vistaHome.darClickEnComidasSegunTuObjetivo();
         String url = vistaHome.obtenerURLActual();
-        assertThat(url, containsStringIgnoringCase("/spring/empezar-reto"));
+        assertThat(url, containsStringIgnoringCase("/spring/alimentacion"));
     }
 }

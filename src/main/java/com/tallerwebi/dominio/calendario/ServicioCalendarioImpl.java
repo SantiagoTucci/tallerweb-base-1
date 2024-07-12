@@ -57,6 +57,12 @@ public class ServicioCalendarioImpl implements ServicioCalendario {
     }
 
     @Override
+    public DatosItemRendimiento obtenerItemMasSeleccionadoPorUsuario(Usuario usuario) {
+        ItemRendimiento itemRendimiento = repositorioCalendario.obtenerItemMasSeleccionadoPorUsuario(usuario);
+        return itemRendimiento != null ? new DatosItemRendimiento(itemRendimiento) : null;
+    }
+
+    @Override
     public void guardarItemRendimientoEnUsuario(ItemRendimiento itemRendimiento, Usuario usuario) throws UsuarioYaCargoSuRendimientoDelDiaException {
         if(this.validarSiElUsuarioPuedeCargarRutinaHoy(usuario)){
             this.repositorioCalendario.guardarRendimientoEnUsuario(itemRendimiento,usuario);
