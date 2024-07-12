@@ -77,11 +77,11 @@ public class ControladorLogin {
     @RequestMapping(path = "/home", method = RequestMethod.GET)
     public ModelAndView irAHome(HttpSession session){
         ModelAndView modelAndView = new ModelAndView("home");
-        // Obtener el usuario de la sesión
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
-            modelAndView.setViewName("redirect:/login");
+            return new ModelAndView("redirect:/login");
         }
+
         modelAndView.addObject("usuario", usuario);
         session.setAttribute("usuario", usuario);
 
