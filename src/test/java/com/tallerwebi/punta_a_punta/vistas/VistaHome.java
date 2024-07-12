@@ -21,8 +21,8 @@ public class VistaHome extends VistaWeb{
         return this.obtenerTextoDelElemento("#btn-empezar");
     }
 
-    public void darClickEnEmpezar() {
-        this.darClickEnElElemento("#btn-empezar");
+    public void darClickEnComidasSegunTuObjetivo() {
+        this.darClickEnElElemento("#link-comidas-inicio");
     }
 
     public void darClickEnComenzarEntrenamiento() {

@@ -67,6 +67,7 @@ public class VistaHomeE2E {
         assertThat("Empezar", equalToIgnoringCase(texto));
     }
 
+    //Solo funciona en el caso de no haber tomado una rutina
     @Test
     void deberiaNavegarARutinasAlApretarElBotonComenzarEntrenamiento(){
         vistaHome.darClickEnComenzarEntrenamiento();
@@ -75,9 +76,9 @@ public class VistaHomeE2E {
     }
 
     @Test
-    void deberiaEmpezarRetoAlApretarElBoton(){
-        vistaHome.darClickEnEmpezar();
+    void deberiaNavegarAlimentacionAlDarEnComidasSegunObjetivo(){
+        vistaHome.darClickEnComidasSegunTuObjetivo();
         String url = vistaHome.obtenerURLActual();
-        assertThat(url, containsStringIgnoringCase("/spring/empezar-reto"));
+        assertThat(url, containsStringIgnoringCase("/spring/alimentacion"));
     }
 }
