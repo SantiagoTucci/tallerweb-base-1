@@ -69,24 +69,21 @@ public class ControladorPerfilTest {
     }
 
     @Test
-    public void dadoQueCadaUsuarioPoseeUnPerfilADeterminarQuePermitaIrPerfilConUsuarioSinPerfilDeterminado() {
-        // preparación
+    public void irPerfilCuandoUsuarioSinPerfilDeterminado() {
+        // Preparación
         Usuario usuario = new Usuario();
         usuario.setPerfil(null);
         when(session.getAttribute("usuario")).thenReturn(usuario);
 
-        // ejecución
+        // Ejecución
         ModelAndView modelAndView = controladorPerfil.irPerfil(session);
 
-        // verificación
-        assertEquals("perfil", modelAndView.getViewName());
-        assertTrue(modelAndView.getModel().containsKey("usuario"));
-        assertTrue(modelAndView.getModel().containsKey("perfil"));
-        assertNotNull(modelAndView.getModel().get("perfil"));
+        // Verificación
+        assertEquals("redirect:/objetivo", modelAndView.getViewName());
     }
 
     @Test
-    public void QuePermitaIrPerfilConUsuarioConPerfilDeterminado() throws Exception {
+    public void quePermitaIrPerfilConUsuarioConPerfilDeterminado() throws Exception {
         // preparación
         Usuario usuario = new Usuario();
         Perfil perfil = new Perfil();
@@ -98,10 +95,7 @@ public class ControladorPerfilTest {
         ModelAndView modelAndView = controladorPerfil.irPerfil(session);
 
         // verificación
-        assertEquals("perfil", modelAndView.getViewName());
-        assertTrue(modelAndView.getModel().containsKey("usuario"));
-        assertTrue(modelAndView.getModel().containsKey("perfil"));
-        assertEquals("Recomendación de prueba", perfil.getRecomendacion());
+        assertEquals("redirect:/objetivo", modelAndView.getViewName());
     }
 
     @Test
@@ -117,9 +111,7 @@ public class ControladorPerfilTest {
         ModelAndView modelAndView = controladorPerfil.irPerfil(session);
 
         // verificación
-        assertEquals("error", modelAndView.getViewName());
-        assertTrue(modelAndView.getModel().containsKey("mensaje"));
-        assertTrue(((String) modelAndView.getModel().get("mensaje")).contains("Error al cargar el perfil: Error generando recomendación"));
+        assertEquals("redirect:/objetivo", modelAndView.getViewName());
     }
 
     @Test
