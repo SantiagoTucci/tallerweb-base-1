@@ -20,10 +20,9 @@ public class DatabaseInitializationConfig {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
 
         populator.addScript(new ClassPathResource("data.sql"));
-//        populator.addScript(new ClassPathResource("ejercicio.sql"));
-//        populator.addScript(new ClassPathResource("reto.sql"));
-//        populator.addScript(new ClassPathResource("rutina.sql"));
-//        populator.addScript(new ClassPathResource("rutina_ejercicio.sql"));
+        populator.addScript(new ClassPathResource("ejercicio.sql"));
+        populator.addScript(new ClassPathResource("rutina.sql"));
+        populator.addScript(new ClassPathResource("rutina_ejercicio.sql"));
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
         initializer.setDatabasePopulator(populator);
