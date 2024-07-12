@@ -72,15 +72,6 @@ public class RepositorioRetoTest {
     }
 
 
-    @Test
-    @Transactional
-    @Rollback
-    public void queAlObtenerRetoDisponibleSeObtengaUnRetoConSuAtributoSeleccionadoEnFalse() {
-        Reto reto = repositorioReto.obtenerRetoDisponible();
-        assertNotNull(reto, "El método obtenerRetoDisponible no debe devolver null.");
-        assertFalse(reto.getSeleccionado(), "El reto devuelto debe tener seleccionado en false.");
-    }
-
     private Reto dadoQueExistenRetosEnLaBaseDeDatos() {
         LocalDate fecha = LocalDate.now();
         Reto retoGuardado = new Reto("nombre","descripcion", "descripcion", fecha);

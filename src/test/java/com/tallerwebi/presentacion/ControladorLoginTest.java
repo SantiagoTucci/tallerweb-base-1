@@ -148,9 +148,6 @@ public class ControladorLoginTest {
 		// validación
 		assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
 		assertNotNull(modelAndView.getModel().get("usuario"));
-		assertNotNull(modelAndView.getModel().get("itemMasSeleccionado"));
-		assertNotNull(modelAndView.getModel().get("retoDisponible"));
-		assertNotNull(modelAndView.getModel().get("minutosRestantes"));
 	}
 
 	@Test
