@@ -1,283 +1,180 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.usuario.Usuario;
+import com.tallerwebi.dominio.excepcion.ObjetivoNoExisteException;
+import com.tallerwebi.dominio.excepcion.RutinaNoEncontradaException;
+import com.tallerwebi.dominio.excepcion.UsuarioNoExisteException;
+import com.tallerwebi.dominio.excepcion.UsuarioYaCargoSuRendimientoDelDiaException;
 import com.tallerwebi.dominio.objetivo.Objetivo;
-import static org.mockito.Mockito.*;
-
-import com.tallerwebi.dominio.rutina.Rutina;
-import com.tallerwebi.dominio.rutina.ServicioRutina;
-
+import com.tallerwebi.dominio.rutina.EstadoEjercicio;
+import com.tallerwebi.dominio.usuario.Usuario;
+import com.tallerwebi.integracion.config.HibernateTestIntegracionConfig;
+import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.Objects;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.tallerwebi.dominio.rutina.ServicioRutina;
 
-
+@ExtendWith(SpringExtension.class)
+@WebAppConfiguration
+@ContextConfiguration(classes = {SpringWebTestConfig.class, HibernateTestIntegracionConfig.class})
 public class ControladorRutinaTest {
 
-    private Usuario usuarioMock;
-    private MockMvc mockMvc;
-    private MockHttpSession session;
     @Mock
     private ServicioRutina servicioRutina;
+
     @InjectMocks
     private ControladorRutina controladorRutina;
+
+    private Usuario usuarioMock;
+    private MockHttpSession session;
+
+    @Autowired
+    private WebApplicationContext wac;
+    private MockMvc mockMvc;
 
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(controladorRutina).build();
+        usuarioMock = mock(Usuario.class);
+        when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
         session = new MockHttpSession();
-        usuarioMock = new Usuario();
-        usuarioMock.setNombre("Lautaro");
-        usuarioMock.setObjetivo(Objetivo.PERDIDA_DE_PESO);
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
     }
+
     @Test
-    @Transactional
-    @Rollback
-    public void queAlIrALaPantallaDeRutinaMeMuestreLaVistaDeRutinaSiTieneUnaRutinaActiva() throws Exception {
-        // Preparación
-        Rutina rutinaMock = new Rutina("Rutina de correr", Objetivo.PERDIDA_DE_PESO);
-        DatosRutina datosRutinaMock = new DatosRutina(rutinaMock);
-        when(servicioRutina.getRutinaParaUsuario(usuarioMock)).thenReturn(datosRutinaMock);
-
-        // Configuración de la sesión
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioMock);
-
-        // Ejecución
-        MvcResult result = mockMvc.perform(get("/mi-rutina").session(session))
-                .andExpect(status().isOk())
-                .andExpect(view().name("rutina"))
+    public void debeRedirigirALoginCuandoElUsuarioNoEstaLogueado() throws Exception {
+        MvcResult result = this.mockMvc.perform(get("/rutinas"))
+                .andExpect(status().is3xxRedirection())
                 .andReturn();
 
-        // Verificación
         ModelAndView modelAndView = result.getModelAndView();
-        DatosRutina rutinaObtenida = (DatosRutina) modelAndView.getModel().get("rutina");
+        assert modelAndView != null;
+        assertThat("redirect:/login", equalToIgnoringCase(Objects.requireNonNull(modelAndView.getViewName())));
     }
 
     @Test
-    @Transactional
-    @Rollback
-    public void queRedirijaAVistaObjetivosSiUsuarioNoTieneObjetivoDefinido() throws Exception {
+    public void queRedirijaALoginCuandoUsuarioEsNullEnIrAMiRutina() {
         // Preparación
-        Usuario usuarioSinObjetivo = new Usuario();
-        usuarioSinObjetivo.setObjetivo(null);
-
-        // Configuración de la sesión
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioSinObjetivo);
 
         // Ejecución
-        mockMvc.perform(get("/mi-rutina").session(session))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/objetivo"));
-    }
-
-    @Test
-    @Transactional
-    @Rollback
-    public void queRedirijaASeleccionDeRutinasSiOcurreExcepcion() throws Exception {
-        // Preparación
-        Objetivo objetivo = Objetivo.PERDIDA_DE_PESO;
-        usuarioMock.setObjetivo(objetivo);
-        when(servicioRutina.getRutinaActualDelUsuario(usuarioMock)).thenThrow(new RuntimeException());
-
-        // Configuración de la sesión
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioMock);
-
-        // Ejecución
-        String objetivoFormateado = objetivo.formatear();
-        String expectedRedirectUrl = "/rutinas?objetivo=" + objetivo.toString() + "&objetivoFormateado=" + objetivoFormateado;
-        mockMvc.perform(get("/mi-rutina").session(session))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl(expectedRedirectUrl));
-    }
-
-    @Test
-    @Transactional
-    @Rollback
-    public void queAsigneRutinaAlUsuarioYRedirijaAVistaDeRutina() throws Exception {
-        // Preparación
-        Long rutinaId = 1L;
-        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
-        usuarioMock.setId(1L);
-        Rutina rutinaMock = new Rutina("Rutina de correr", Objetivo.PERDIDA_DE_PESO);
-        DatosRutina datosRutinaMock = new DatosRutina(rutinaMock);
-
-        when(servicioRutina.getRutinaById(rutinaId)).thenReturn(rutinaMock);
-        when(servicioRutina.getDatosRutinaById(rutinaId)).thenReturn(datosRutinaMock);
-
-        // Configuración de la sesión
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioMock);
-
-        // Ejecución
-        MvcResult result = mockMvc.perform(get("/asignar-rutina")
-                        .param("id", rutinaId.toString())
-                        .session(session))
-                .andExpect(view().name("redirect:/mi-rutina"))
-                .andReturn();
+        ModelAndView modelAndView = controladorRutina.irAMiRutina(session);
 
         // Verificación
-        ModelAndView modelAndView = result.getModelAndView();
-        DatosRutina rutinaObtenida = (DatosRutina) modelAndView.getModel().get("rutina");
-
-        assertThat(rutinaObtenida.getNombre(), equalTo(datosRutinaMock.getNombre()));
-        verify(servicioRutina).asignarRutinaAUsuario(rutinaMock, usuarioMock);
+        assertEquals("redirect:/login", modelAndView.getViewName());
     }
 
     @Test
-    @Transactional
-    @Rollback
-    public void queAlQuererAsignarRutinaRedirijaAVistaObjetivosSiRutinaNoExiste() throws Exception {
+    public void queRedirijaAObjetivoCuandoObjetivoDelUsuarioEsNullEnIrAMiRutina() {
         // Preparación
-        Long rutinaId = 1L;
-        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
-        usuarioMock.setId(1L);
-
-        when(servicioRutina.getRutinaById(rutinaId)).thenReturn(null);
-
-        // Configuración de la sesión
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioMock);
+        Usuario usuario = new Usuario();
+        usuario.setObjetivo(null);  // Usuario sin objetivo
+        session.setAttribute("usuario", usuario);
 
         // Ejecución
-        mockMvc.perform(get("/asignar-rutina")
-                        .param("id", rutinaId.toString())
-                        .session(session))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/objetivo"));
-    }
-
-    @Test
-    @Transactional
-    @Rollback
-    public void queAlQuererAsignarRutinaRedirijaAVistaObjetivosSiOcurreUnaExcepcion() throws Exception {
-        // Preparación
-        Long rutinaId = 1L;
-        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
-        usuarioMock.setId(1L);
-
-        when(servicioRutina.getRutinaById(rutinaId)).thenThrow(new RuntimeException());
-
-        // Configuración de la sesión
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioMock);
-
-        // Ejecución
-        mockMvc.perform(get("/asignar-rutina")
-                        .param("id", rutinaId.toString())
-                        .session(session))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/objetivo"));
-    }
-
-    @Test
-    @Transactional
-    @Rollback
-    public void queLibereRutinaDelUsuarioYRedirijaASeccionDeRutinas() throws Exception {
-        // Preparación
-        Long rutinaId = 1L;
-        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
-        usuarioMock.setId(1L);
-        Rutina rutinaMock = new Rutina("Rutina de correr", Objetivo.PERDIDA_DE_PESO);
-        DatosRutina datosRutinaMock = new DatosRutina(rutinaMock);
-
-        when(servicioRutina.getRutinaById(rutinaId)).thenReturn(rutinaMock);
-        when(servicioRutina.getDatosRutinaById(rutinaId)).thenReturn(datosRutinaMock);
-
-        // Configuración de la sesión
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioMock);
-
-        // Ejecución
-        MvcResult result = mockMvc.perform(post("/liberar-rutina")
-                        .param("id", rutinaId.toString())
-                        .session(session))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("/rutinas?objetivo=PERDIDA_DE_PESO&info=*&objetivoFormateado=*"))
-                .andReturn();
+        ModelAndView modelAndView = controladorRutina.irAMiRutina(session);
 
         // Verificación
-        verify(servicioRutina).liberarRutinaActivaDelUsuario(usuarioMock);
-        ModelAndView modelAndView = result.getModelAndView();
-        assertThat(modelAndView.getModel().get("info"), equalTo("Rutina liberada."));
-        assertThat(modelAndView.getModel().get("objetivoFormateado"), equalTo(usuarioMock.getObjetivo().formatear()));
+        assertEquals("redirect:/objetivo", modelAndView.getViewName());
     }
 
     @Test
-    @Transactional
-    @Rollback
-    public void queAlQuererLiberarRutinaMuestreErrorSiRutinaNoExiste() throws Exception {
-        // Preparación
-        Long rutinaId = 1L;
-        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
-        usuarioMock.setId(1L);
-
-        when(servicioRutina.getRutinaById(rutinaId)).thenReturn(null);
-
-        // Configuración de la sesión
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioMock);
-
-        // Ejecución
-        MvcResult result = mockMvc.perform(post("/liberar-rutina")
-                        .param("id", rutinaId.toString())
-                        .session(session))
-                .andExpect(status().isOk())
-                .andExpect(view().name("rutina"))
-                .andReturn();
-
-        // Verificación
-        ModelAndView modelAndView = result.getModelAndView();
-        assertThat(modelAndView.getModel().get("error"), equalTo("Error al liberar la rutina."));
+    public void queAlQuererActualizarElEstadoDeUnEjercicioRedirijaAlLoginPorqueElUsuarioNoEstaAutenticado() {
+        // Caso de prueba 1
+        String resultado = controladorRutina.actualizarEstadoEjercicio(1L, EstadoEjercicio.Estado.COMPLETO, session);
+        assertEquals("redirect:/login", resultado);
     }
 
     @Test
-    @Transactional
-    @Rollback
-    public void queAlQuererLiberarRutinaMuestreErrorSiOcurreUnaExcepcion() throws Exception {
-        // Preparación
-        Long rutinaId = 1L;
-        Usuario usuarioMock = new Usuario("Lautaro", Objetivo.PERDIDA_DE_PESO);
-        usuarioMock.setId(1L);
+    public void queAlGuardarObjetivoConElUsuarioAutenticadoYObjetivoValidoNosRedirijaARutinas() throws UsuarioNoExisteException, ObjetivoNoExisteException {
+        // Caso de prueba 2
+        Usuario usuario = new Usuario();
+        session.setAttribute("usuario", usuario);
 
-        when(servicioRutina.getRutinaById(rutinaId)).thenThrow(new RuntimeException());
-
-        // Configuración de la sesión
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("usuario", usuarioMock);
-
-        // Ejecución
-        MvcResult result = mockMvc.perform(post("/liberar-rutina")
-                        .param("id", rutinaId.toString())
-                        .session(session))
-                .andExpect(status().isOk())
-                .andExpect(view().name("rutina"))
-                .andReturn();
-
-        // Verificación
-        ModelAndView modelAndView = result.getModelAndView();
-        assertThat(modelAndView.getModel().get("error"), equalTo("EXCEPCION: error al liberar la rutina."));
+        ModelAndView resultado = controladorRutina.guardarObjetivo("GANANCIA_MUSCULAR", session);
+        assertEquals("redirect:/rutinas", resultado.getViewName());
+        verify(servicioRutina, times(1)).guardarObjetivoEnUsuario(Objetivo.GANANCIA_MUSCULAR, usuario);
     }
 
+    @Test
+    public void queAlQuererCalcularElRendimientoDeLaRutinaConUsuarioNoAutenticadoNosRedirijaAlLogin() throws RutinaNoEncontradaException, UsuarioYaCargoSuRendimientoDelDiaException {
+        ModelAndView resultado = controladorRutina.calcularRendimiento(1L, session);
+        assertEquals("redirect:/login", resultado.getViewName());
+    }
+
+    @Test
+    public void queAlGuardarObjetivoConElUsuarioAutenticadoSeLanceUnaExcepcionPorObjetivoInvalido() throws UsuarioNoExisteException, ObjetivoNoExisteException {
+        // Caso de prueba 3
+        Usuario usuario = new Usuario();
+        session.setAttribute("usuario", usuario);
+
+        ModelAndView resultado = controladorRutina.guardarObjetivo("OBJETIVO_INVALIDO", session);
+        assertEquals("objetivo", resultado.getViewName());
+        assertTrue(resultado.getModel().containsKey("Excepcion:"));
+        verify(servicioRutina, times(0)).guardarObjetivoEnUsuario(any(Objetivo.class), eq(usuario));
+    }
+
+    @Test
+    public void queAlQuererVerLaVistaObjetivosRedirijaAlLoginSiElUsuarioNoEstaAutenticado() {
+        ModelAndView resultado = controladorRutina.mostrarVistaObjetivos(session);
+        assertEquals("redirect:/login", resultado.getViewName());
+    }
+
+    @Test
+    public void queAlQuererGuardarUnObjetivoSinElUsuarioAutenticadoNosRedirijaAlLogin() {
+        // Caso de prueba 1
+        ModelAndView resultado = controladorRutina.guardarObjetivo("GANANCIA_MUSCULAR", session);
+        assertEquals("redirect:/login", resultado.getViewName());
+    }
+
+    @Test
+    public void queSeMuestreLaVistaObjetivoSiElUsuarioEstaAutenticado() {
+        Usuario usuario = new Usuario();
+        session.setAttribute("usuario", usuario);
+
+        ModelAndView resultado = controladorRutina.mostrarVistaObjetivos(session);
+        assertEquals("objetivo", resultado.getViewName());
+        assertEquals(usuario, resultado.getModel().get("usuario"));
+    }
+
+    @Test
+    public void queAlActualizarUnEstadoEjercicioRedirijaAMiRutinaSiSePudoActualizar() {
+        // Caso de prueba 2
+        Usuario usuario = new Usuario();
+        session.setAttribute("usuario", usuario);
+
+        String resultado = controladorRutina.actualizarEstadoEjercicio(1L, EstadoEjercicio.Estado.COMPLETO, session);
+        assertEquals("redirect:/mi-rutina", resultado);
+
+        verify(servicioRutina, times(1)).actualizarEstadoEjercicio(usuario, 1L, EstadoEjercicio.Estado.COMPLETO);
+    }
+
+    @Test
+    public void queAlIntentarAsignarUnaRutinaRedirijaALoginPorqueElUsuarioNoEstaAutenticado() {
+        ModelAndView modelAndView = controladorRutina.asignarRutina(1L, session);
+        assertEquals("redirect:/login", modelAndView.getViewName());
+    }
 }
