@@ -73,9 +73,11 @@ public class ControladorCalendarioTest {
 
         ModelAndView modelAndView = result.getModelAndView();
         assert modelAndView != null;
-        assertThat(modelAndView.getViewName(), equalToIgnoringCase("calendario"));
+
+        assertThat(modelAndView.getViewName(), equalToIgnoringCase("verProgreso"));
         assertThat(modelAndView.getModel().get("message").toString(), containsString("¿Cómo fue tu entrenamiento hoy?"));
     }
+
 
     @Test
     public void debeRedirigirALoginCuandoElUsuarioNoEstaLogueado() throws Exception {

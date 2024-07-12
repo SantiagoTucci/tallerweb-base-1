@@ -40,7 +40,4 @@ public class RepositorioPerfilImpl implements RepositorioPerfil {
         Session session = sessionFactory.getCurrentSession();
         session.update(perfilActualizado);
     }
-
-
-
 }

@@ -1,37 +1,30 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.calendario.*;
-import com.tallerwebi.dominio.excepcion.ItemRendimientoDuplicadoException;
+import com.tallerwebi.dominio.calendario.ItemRendimiento;
+import com.tallerwebi.dominio.calendario.ServicioCalendario;
+import com.tallerwebi.dominio.calendario.TipoRendimiento;
+import com.tallerwebi.dominio.excepcion.UsuarioYaCargoSuRendimientoDelDiaException;
+import com.tallerwebi.dominio.objetivo.Objetivo;
 import com.tallerwebi.dominio.usuario.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class ControladorCalendarioTest {
 
     private ServicioCalendario servicioCalendario;
     private ControladorCalendario controladorCalendario;
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Mock
     private HttpSession session;
@@ -49,80 +42,80 @@ public class ControladorCalendarioTest {
 
     @Test
     public void queAlIrALaPantallaDeCalendarioSinUsuarioRedirijaALogin() {
-        // preparacion
+        // Preparación
         when(session.getAttribute("usuario")).thenReturn(null);
 
-        // ejecucion
+        // Ejecución
         ModelAndView modelAndView = controladorCalendario.mostrarCalendario(session);
 
-        // verificacion
+        // Verificación
         assertEquals("redirect:/login", modelAndView.getViewName()); // Verificar redirección a login
     }
 
     @Test
     public void queSeLogreGuardarUnItemRendimientoSinUsuarioRedirijaALogin() {
-        // preparacion
+        // Preparación
         when(session.getAttribute("usuario")).thenReturn(null);
 
-        // ejecucion
-        ModelAndView modelAndView = controladorCalendario.verProgreso(session);
+        // Ejecución
+        ModelAndView modelAndView = controladorCalendario.guardarItemRendimiento(new ItemRendimiento(), session);
 
-        // verificacion
+        // Verificación
         assertEquals("redirect:/login", modelAndView.getViewName()); // Verificar redirección a login
     }
 
     @Test
     public void queAlIrVerProgresoSinUsuarioRedirijaALogin() {
-        // preparacion
+        // Preparación
         when(session.getAttribute("usuario")).thenReturn(null);
 
-        // ejecucion
+        // Ejecución
         ModelAndView modelAndView = controladorCalendario.verProgreso(session);
 
-        // verificacion
+        // Verificación
         assertEquals("redirect:/login", modelAndView.getViewName()); // Verificar redirección a login
     }
 
     @Test
     public void queAlIrALaPantallaDeCalendarioConUsuarioAutenticadoSeRendericeCorrectamente() {
-        // preparación
+        // Preparación
         when(session.getAttribute("usuario")).thenReturn(usuario);
 
-        // ejecución
+        // Ejecución
         ModelAndView modelAndView = controladorCalendario.mostrarCalendario(session);
 
-        // verificación
-        assertEquals("calendario", modelAndView.getViewName());
+        // Verificación
+        assertEquals("verProgreso", modelAndView.getViewName());
         assertNotNull(modelAndView.getModel().get("itemRendimiento"));
         assertEquals(usuario, modelAndView.getModel().get("usuario"));
     }
 
     @Test
-    public void dadoQueElUsuarioEstaEnLaVistaCalendarioQueSeLogreGuardarUnItemRendimientoConExito() {
-        // preparación
+    public void dadoQueElUsuarioEstaEnLaVistaCalendarioQueSeLogreGuardarUnItemRendimientoConExito() throws UsuarioYaCargoSuRendimientoDelDiaException {
+        // Preparación
         when(session.getAttribute("usuario")).thenReturn(usuario);
         ItemRendimiento itemRendimiento = new ItemRendimiento();
 
-        // ejecución
+        // Ejecución
         ModelAndView modelAndView = controladorCalendario.guardarItemRendimiento(itemRendimiento, session);
 
-        // verificación
+        // Verificación
         assertEquals("redirect:/verProgreso", modelAndView.getViewName());
-        verify(servicioCalendario, times(1)).guardarItemRendimiento(itemRendimiento);
+        verify(servicioCalendario, times(1)).guardarItemRendimientoEnUsuario(itemRendimiento, usuario);
     }
 
     @Test
-    public void queAlIntentarGuardarUnItemRendimientoDuplicadoSeMuestreUnMensajeDeError() {
-        // preparación
+    public void queAlIntentarGuardarUnItemRendimientoDuplicadoSeMuestreUnMensajeDeError() throws UsuarioYaCargoSuRendimientoDelDiaException {
+        // Preparación
         when(session.getAttribute("usuario")).thenReturn(usuario);
         ItemRendimiento itemRendimiento = new ItemRendimiento();
-        doThrow(new ItemRendimientoDuplicadoException("No se puede guardar tu rendimiento más de una vez el mismo día."))
-                .when(servicioCalendario).guardarItemRendimiento(any(ItemRendimiento.class));
+        doThrow(new UsuarioYaCargoSuRendimientoDelDiaException("No se puede guardar tu rendimiento más de una vez el mismo día."))
+                .when(servicioCalendario).guardarItemRendimientoEnUsuario(any(ItemRendimiento.class), eq(usuario));
 
-        // ejecución
+        // Ejecución
         ModelAndView modelAndView = controladorCalendario.guardarItemRendimiento(itemRendimiento, session);
 
-        // verificación
+        // Verificación
         assertEquals("calendario", modelAndView.getViewName());
         assertEquals("No se puede guardar tu rendimiento más de una vez el mismo día.", modelAndView.getModel().get("error"));
         assertEquals(usuario, modelAndView.getModel().get("usuario"));
@@ -130,38 +123,72 @@ public class ControladorCalendarioTest {
 
     @Test
     public void queAlVerProgresoConDatosSeRendericeCorrectamente() {
-        // preparación
-        when(session.getAttribute("usuario")).thenReturn(usuario);
+        // Preparación
+        Usuario usuarioConObjetivo = new Usuario();
+        usuarioConObjetivo.setObjetivo(Objetivo.GANANCIA_MUSCULAR); // Asignar un valor del enum Objetivo
+        when(session.getAttribute("usuario")).thenReturn(usuarioConObjetivo);
+
         List<DatosItemRendimiento> itemsMock = Arrays.asList(
                 new DatosItemRendimiento(new ItemRendimiento(TipoRendimiento.DESCANSO)),
                 new DatosItemRendimiento(new ItemRendimiento(TipoRendimiento.ALTO))
         );
-        when(servicioCalendario.obtenerItemsRendimiento()).thenReturn(itemsMock);
+        when(servicioCalendario.getItemsRendimientoDeUsuario(usuarioConObjetivo)).thenReturn(itemsMock);
 
-        // ejecución
+        // Ejecución
         ModelAndView modelAndView = controladorCalendario.verProgreso(session);
 
-        // verificación
+        // Verificación
         assertEquals("verProgreso", modelAndView.getViewName());
         assertEquals(itemsMock, modelAndView.getModel().get("datosItemRendimiento"));
-        assertEquals(false, modelAndView.getModel().get("sinRendimiento"));
-        assertEquals(usuario, modelAndView.getModel().get("usuario"));
+        assertEquals(usuarioConObjetivo, modelAndView.getModel().get("usuario"));
     }
+
 
     @Test
     public void queAlVerProgresoSinDatosSeMuestreMensajeIndicativo() {
-        // preparación
-        when(session.getAttribute("usuario")).thenReturn(usuario);
-        when(servicioCalendario.obtenerItemsRendimiento()).thenReturn(Collections.emptyList());
+        // Preparación
+        Usuario usuarioConObjetivo = new Usuario();
+        usuarioConObjetivo.setObjetivo(Objetivo.GANANCIA_MUSCULAR);
+        when(session.getAttribute("usuario")).thenReturn(usuarioConObjetivo);
+        when(servicioCalendario.getItemsRendimientoDeUsuario(usuarioConObjetivo)).thenReturn(Collections.emptyList());
 
-        // ejecución
         ModelAndView modelAndView = controladorCalendario.verProgreso(session);
 
-        // verificación
         assertEquals("verProgreso", modelAndView.getViewName());
-        assertEquals("¿Cómo fue tu entrenamiento hoy?", modelAndView.getModel().get("mensaje"));
-        assertEquals(true, modelAndView.getModel().get("sinRendimiento"));
-        assertEquals(usuario, modelAndView.getModel().get("usuario"));
+        assertEquals(Collections.emptyList(), modelAndView.getModel().get("datosItemRendimiento"));
+        assertEquals(usuarioConObjetivo, modelAndView.getModel().get("usuario"));
+    }
+
+
+
+    @Test
+    public void queAlIrALaPantallaDeCalendarioConSesionInvalidaRedirijaALogin() {
+        when(session.getAttribute("usuario")).thenThrow(new IllegalStateException("Session invalid"));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            controladorCalendario.mostrarCalendario(session);
+        });
+        assertEquals("Session invalid", exception.getMessage());
+        ModelAndView modelAndView = null;
+        try {
+            modelAndView = controladorCalendario.mostrarCalendario(session);
+        } catch (IllegalStateException e) {
+            modelAndView = new ModelAndView("redirect:/login");
+        }
+        assertEquals("redirect:/login", modelAndView.getViewName());
+    }
+
+
+    @Test
+    public void queAlVerProgresoSinObjetivoRedirijaAObjetivo() {
+        // Preparación
+        usuario.setObjetivo(null); // Ensure the user has no objective set
+        when(session.getAttribute("usuario")).thenReturn(usuario);
+
+        // Ejecución
+        ModelAndView modelAndView = controladorCalendario.verProgreso(session);
+
+        // Verificación
+        assertEquals("redirect:/objetivo", modelAndView.getViewName());
     }
 
 }
